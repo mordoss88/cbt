@@ -27,7 +27,7 @@ Not in yet: the AI coach (it needs a server proxy and a cost decision). Coach no
 Requires a development build (the widget, SQLCipher and the local Android module are native).
 
 ```sh
-npm install --legacy-peer-deps   # react-dom peer conflict from the Google Fonts packages
+npm install                       # .npmrc sets legacy-peer-deps (Google Fonts react-dom peer)
 npm test                          # 60 Jest tests for the core logic
 npm run typecheck && npm run lint
 npx expo run:ios                  # or: npx expo run:android, or eas build --profile development
