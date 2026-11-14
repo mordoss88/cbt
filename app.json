@@ -1,25 +1,85 @@
 {
   "expo": {
-    "name": "cbt-practice-log-app",
-    "slug": "cbt-practice-log-app",
+    "name": "CBT Practice Log",
+    "slug": "cbt-practice-log",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mordoss.cbtpracticelog",
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#EC8160",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.mordoss.cbtpracticelog",
+      "allowBackup": false
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-sqlite",
+        {
+          "useSQLCipher": true,
+          "enableFTS": false
+        }
+      ],
+      "expo-secure-store",
+      "expo-sharing",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#EC8160"
+        }
+      ],
+      [
+        "expo-widgets",
+        {
+          "enableAndroid": true,
+          "widgets": [
+            {
+              "name": "QuoteWidget",
+              "displayName": "Daily saying",
+              "description": "A CBT saying a day. Rate it right on the home screen.",
+              "ios": {
+                "supportedFamilies": [
+                  "systemSmall",
+                  "systemMedium",
+                  "accessoryRectangular"
+                ],
+                "initialLayout": "./src/widgets/QuoteWidget.ios.tsx"
+              },
+              "android": {
+                "targetCellWidth": 4,
+                "targetCellHeight": 2,
+                "minWidth": 250,
+                "minHeight": 110,
+                "initialLayout": "./src/widgets/QuoteWidget.android.tsx"
+              }
+            }
+          ]
+        }
+      ]
+    ],
+    "scheme": "cbtlog",
+    "splash": {
+      "backgroundColor": "#EC8160"
+    },
+    "experiments": {
+      "typedRoutes": true
     }
   }
 }
