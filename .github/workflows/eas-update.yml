@@ -38,6 +38,6 @@ jobs:
       - name: Check before publishing
         run: npm run typecheck && npm test
       - name: Publish update
-        run: eas update --channel preview --message "$MESSAGE" --non-interactive
+        run: eas update --channel preview --message "${MESSAGE%%$'\n'*}" --non-interactive
         env:
           MESSAGE: ${{ github.event.head_commit.message || 'Manual update' }}
