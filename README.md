@@ -38,7 +38,7 @@ npx expo run:ios                  # or: npx expo run:android, or eas build --pro
 
 Then add the "Daily saying" widget from the home screen.
 
-For cloud backup during local dev, copy `.env.example` to `.env.local` and fill in the Supabase URL and publishable key.
+Cloud backup uses the public Supabase values in `.env`. Put overrides in `.env.local`.
 
 ### Build for your phone (EAS)
 
@@ -69,15 +69,11 @@ The runtime version uses the `fingerprint` policy: a change to native code (new 
 
 1. `git pull`, then `eas update:configure`. It adds `updates.url` and `extra.eas.projectId` to app.json. Commit and push.
 2. expo.dev > Account settings > Access tokens: create a token. In GitHub, repo Settings > Secrets and variables > Actions, add it as `EXPO_TOKEN`.
-3. Supabase (the Plants Watering project is fine, this only adds one table):
-   - SQL Editor: run `supabase/migrations/20261114000000_cbt_backups.sql`.
-   - Authentication > Emails: in the **Magic Link** and **Confirm signup** templates, add `Your code: {{ .Token }}` so the email has a 6-digit code. The link keeps working for the other app.
-4. Add the public values to EAS (used by builds and by `eas update --environment preview`):
-   ```sh
-   eas env:create --environment preview --name EXPO_PUBLIC_SUPABASE_URL --value https://<ref>.supabase.co --visibility plaintext
-   eas env:create --environment preview --name EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY --value sb_publishable_... --visibility plaintext
-   ```
-   Do the same for `development` if you use the dev build.
+3. Supabase (Plants Watering project `zhsapizwuuylquevyoam`, this only adds one table). Done on 2026-11-14 except the redirect URL:
+   - SQL Editor: run `supabase/migrations/20261114000000_cbt_backups.sql` (done).
+   - Authentication > URL Configuration > Redirect URLs: add `cbtlog://auth-callback`. The sign-in email link opens the app through it.
+   - Optional: with custom SMTP you can edit the email templates and add `{{ .Token }}`; the app then also accepts the 6-digit code.
+4. The public Supabase URL and publishable key are in the committed `.env`, so builds, `eas update` and Metro all get them.
 5. Build once: `eas build -p android --profile preview` (and iOS if needed). From then on, JS changes ship by pushing to `main`.
 
 ## Layout

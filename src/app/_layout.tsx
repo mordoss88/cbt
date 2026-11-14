@@ -59,6 +59,7 @@ export default function RootLayout() {
               <Stack.Screen name="test" options={{ ...modal, headerShown: true, title: 'Self-check' }} />
               <Stack.Screen name="import" options={{ ...modal, headerShown: true, title: 'Import from tracker' }} />
               <Stack.Screen name="backup" options={{ ...modal, headerShown: true, title: 'Cloud backup' }} />
+              <Stack.Screen name="auth-callback" options={{ ...modal, headerShown: true, title: 'Cloud backup' }} />
               <Stack.Screen name="about" options={{ ...modal, headerShown: true, title: 'About and privacy' }} />
               <Stack.Screen name="guide" options={{ ...modal, headerShown: true, title: 'How to use' }} />
               <Stack.Screen name="sayings" options={{ ...modal, headerShown: true, title: 'Your sayings' }} />

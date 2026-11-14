@@ -29,6 +29,7 @@ interface Backup {
   error: string | null;
   sendCode(email: string): Promise<boolean>;
   verifyCode(email: string, code: string): Promise<void>;
+  finishLink(code: string): Promise<boolean>;
   createPassphrase(p: string, repeat: string): Promise<void>;
   unlock(p: string): Promise<{ added: number; updated: number } | null>;
   backupNow(): Promise<void>;
@@ -142,6 +143,9 @@ export function BackupProvider({ children }: { children: React.ReactNode }) {
     },
     async verifyCode(addr, code) {
       await run('Checking the code…', async () => { await Cloud.verifyCode(c!, addr, code); await refresh(); });
+    },
+    async finishLink(code) {
+      return (await run('Signing in…', async () => { await Cloud.finishLink(c!, code); await refresh(); return true; })) ?? false;
     },
     async createPassphrase(p, repeat) {
       const problem = passphraseProblem(p, repeat);

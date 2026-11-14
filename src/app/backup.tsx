@@ -42,11 +42,12 @@ export default function BackupScreen() {
       {b.phase === 'signed-out' ? (
         <Panel title="1. Sign in with your email">
           <Field label="Email" value={email} onChangeText={setEmail} multiline={false} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} autoComplete="email" />
-          <Btn kind={codeSent ? 'plain' : 'primary'} title={codeSent ? 'Send a new code' : 'Send me a code'} disabled={!email.includes('@') || !!b.busy}
+          <Btn kind={codeSent ? 'plain' : 'primary'} title={codeSent ? 'Send a new email' : 'Email me a sign-in link'} disabled={!email.includes('@') || !!b.busy}
             onPress={async () => { if (await b.sendCode(email)) setCodeSent(true); }} />
           {codeSent ? (
             <>
-              <P muted>We sent a code to {email.trim()}. It can take a minute.</P>
+              <P>We sent an email to {email.trim()}. Open it on this phone and tap the sign-in link. The app opens and signs you in. It can take a minute.</P>
+              <P muted>If the email has a 6-digit code, you can type it here instead.</P>
               <Field label="Code from the email" value={code} onChangeText={setCode} multiline={false} keyboardType="number-pad" autoComplete="one-time-code" />
               <Btn kind="primary" title="Sign in" disabled={code.trim().length < 6 || !!b.busy} onPress={() => b.verifyCode(email, code)} />
             </>

@@ -1,6 +1,6 @@
 # Publishes an over-the-air update to the "preview" channel on every push to main.
 # Needs the repo secret EXPO_TOKEN (expo.dev > Account settings > Access tokens).
-# EXPO_PUBLIC_* values (Supabase URL and publishable key) come from the EAS "preview" environment.
+# EXPO_PUBLIC_* values (Supabase URL and publishable key) come from the committed .env file.
 # The runtime version uses the fingerprint policy: a commit that changes native code
 # gets a new runtime, so installed builds never load it. Those changes need a new build.
 name: EAS Update (preview)
@@ -38,6 +38,6 @@ jobs:
       - name: Check before publishing
         run: npm run typecheck && npm test
       - name: Publish update
-        run: eas update --channel preview --environment preview --message "$MESSAGE" --non-interactive
+        run: eas update --channel preview --message "$MESSAGE" --non-interactive
         env:
           MESSAGE: ${{ github.event.head_commit.message || 'Manual update' }}

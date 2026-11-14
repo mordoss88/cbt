@@ -59,7 +59,7 @@ export const GUIDE: GuideSection[] = [
       'The tracker keeps your data. Nothing there is changed or deleted.'] ] },
   { id: 'backup', title: 'Cloud backup: keep a safe copy', blocks: [
     'Cloud backup keeps an encrypted copy of your data online, so you can get it back on a new phone. It is optional.',
-    ['Open **More** and tap **Set up cloud backup**. Type your email and tap **Send me a code**, then type the code from the email.',
+    ['Open **More** and tap **Set up cloud backup**. Type your email and tap **Email me a sign-in link**. Open the email on this phone and tap the link: the app opens and signs you in.',
       'Choose a passphrase of at least 10 characters. A short sentence only you know works well. Write it down somewhere safe.',
       'Your data is encrypted on this phone with your passphrase before it is sent. The server only stores a locked file it cannot read.',
       'The app backs up by itself when you leave the app, if something changed. You can also tap **Back up now**.',

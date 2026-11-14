@@ -27,14 +27,23 @@ export function cloud(db: SQLiteDatabase): SupabaseClient | null {
         autoRefreshToken: true,
         persistSession: true,
         detectSessionInUrl: false,
+        // PKCE: the email link opens the app with a one-time code; the verifier stays in the encrypted db.
+        flowType: 'pkce',
       },
     });
   }
   return client;
 }
 
+/* The email has a sign-in link that opens the app (cbtlog://auth-callback). If the project's email
+   templates include {{ .Token }}, the 6-digit code from the email works too. */
+export const AUTH_REDIRECT = 'cbtlog://auth-callback';
 export async function sendCode(c: SupabaseClient, email: string) {
-  const { error } = await c.auth.signInWithOtp({ email: email.trim(), options: { shouldCreateUser: true } });
+  const { error } = await c.auth.signInWithOtp({ email: email.trim(), options: { shouldCreateUser: true, emailRedirectTo: AUTH_REDIRECT } });
+  if (error) throw error;
+}
+export async function finishLink(c: SupabaseClient, code: string) {
+  const { error } = await c.auth.exchangeCodeForSession(code);
   if (error) throw error;
 }
 export async function verifyCode(c: SupabaseClient, email: string, code: string) {
