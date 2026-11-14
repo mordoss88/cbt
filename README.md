@@ -35,6 +35,24 @@ npx expo run:ios                  # or: npx expo run:android, or eas build --pro
 
 Then add the "Daily saying" widget from the home screen.
 
+### Build for your phone (EAS)
+
+```sh
+npm i -g eas-cli && eas login
+eas init                                   # links the app to your Expo account (once)
+
+# Android: installable APK
+eas build -p android --profile preview      # standalone app, no dev server needed
+eas build -p android --profile development  # dev client, run `npx expo start` to load JS
+
+# iOS: needs an Apple Developer account
+eas device:create                           # register your iPhone (once), open the link on the phone
+eas build -p ios --profile preview          # standalone app, installed via the link/QR from EAS
+eas build -p ios --profile development      # dev client
+```
+
+Each build ends with a link and QR code. Open it on the phone to install. On iPhone, also turn on Settings > Privacy & Security > Developer Mode for internal builds.
+
 ## Layout
 
 ```
