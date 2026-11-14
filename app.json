@@ -86,8 +86,15 @@
       "policy": "fingerprint"
     },
     "updates": {
+      "url": "https://u.expo.dev/ecb7ad76-5595-45c8-b5cc-5586b15bfc81",
       "checkAutomatically": "ON_LOAD",
       "fallbackToCacheTimeout": 0
+    },
+    "owner": "mordoss",
+    "extra": {
+      "eas": {
+        "projectId": "ecb7ad76-5595-45c8-b5cc-5586b15bfc81"
+      }
     }
   }
 }
