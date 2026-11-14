@@ -1,7 +1,7 @@
 -- CBT Practice Log: encrypted backups. One row per account.
 -- The app encrypts the backup on the phone (XChaCha20-Poly1305, key from the person's passphrase).
 -- This table only ever holds the encrypted envelope: nobody with database access can read the data.
--- Safe to run in a Supabase project that other apps use: it only adds this one table.
+-- Run in the cbt-practice-log Supabase project (it only adds this one table).
 
 create table if not exists public.cbt_backups (
   user_id uuid primary key default auth.uid() references auth.users (id) on delete cascade,

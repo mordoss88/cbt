@@ -12,7 +12,7 @@ An offline-first CBT self-help app for anxiety. It moves the CBT Practice Log tr
 - **Saying of the day**: 40 CBT sayings written for the app. "Helps" sayings come back more often, "Not for me" sayings do not come back.
 - **Home-screen widget** (iOS and Android, part of the app): today's saying with Helps / Not for me buttons.
 - **Import from tracker**: reads the tracker's Export file (format 2 or 1) and merges it. Importing twice makes no copies.
-- **Cloud backup** (optional): encrypted on the phone with the person's passphrase, stored in Supabase. Restore merges, so nothing is lost.
+- **Cloud backup** (optional): encrypted on the phone with the person's passphrase, stored in its own Supabase project. Restore merges, so nothing is lost.
 - **Over-the-air updates** (EAS Update): JS changes reach installed builds without a rebuild.
 - **Export / Delete everything**, country for help numbers, in-app Guide.
 
@@ -69,9 +69,9 @@ The runtime version uses the `fingerprint` policy: a change to native code (new 
 
 1. `git pull`, then `eas update:configure`. It adds `updates.url` and `extra.eas.projectId` to app.json. Commit and push.
 2. expo.dev > Account settings > Access tokens: create a token. In GitHub, repo Settings > Secrets and variables > Actions, add it as `EXPO_TOKEN`.
-3. Supabase (Plants Watering project `zhsapizwuuylquevyoam`, this only adds one table). Done on 2026-11-14 except the redirect URL:
+3. Supabase: its own project `cbt-practice-log` (`jtpdkndwseaekedrepdj`, Frankfurt, free plan). Done on 2026-11-14:
    - SQL Editor: run `supabase/migrations/20261114000000_cbt_backups.sql` (done).
-   - Authentication > URL Configuration > Redirect URLs: add `cbtlog://auth-callback`. The sign-in email link opens the app through it.
+   - Authentication > URL Configuration > Redirect URLs: `cbtlog://auth-callback` (done). The sign-in email link opens the app through it.
    - Optional: with custom SMTP you can edit the email templates and add `{{ .Token }}`; the app then also accepts the 6-digit code.
 4. The public Supabase URL and publishable key are in the committed `.env`, so builds, `eas update` and Metro all get them.
 5. Build once: `eas build -p android --profile preview` (and iOS if needed). From then on, JS changes ship by pushing to `main`.
