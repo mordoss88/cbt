@@ -12,6 +12,8 @@ An offline-first CBT self-help app for anxiety. It moves the CBT Practice Log tr
 - **Saying of the day**: 40 CBT sayings written for the app. "Helps" sayings come back more often, "Not for me" sayings do not come back.
 - **Home-screen widget** (iOS and Android, part of the app): today's saying with Helps / Not for me buttons.
 - **Import from tracker**: reads the tracker's Export file (format 2 or 1) and merges it. Importing twice makes no copies.
+- **Cloud backup** (optional): encrypted on the phone with the person's passphrase, stored in Supabase. Restore merges, so nothing is lost.
+- **Over-the-air updates** (EAS Update): JS changes reach installed builds without a rebuild.
 - **Export / Delete everything**, country for help numbers, in-app Guide.
 
 Not in yet: the AI coach (it needs a server proxy and a cost decision). Coach notes and chat history are imported and kept for it.
@@ -19,7 +21,8 @@ Not in yet: the AI coach (it needs a server proxy and a cost decision). Coach no
 ## Privacy
 
 - All data is on the device in one SQLite database encrypted with SQLCipher (`expo-sqlite` with `useSQLCipher`). The 256-bit key is made on first start and kept in the Keychain / Keystore (`expo-secure-store`, this device only).
-- No account, no server, no analytics, no network calls. Android backup is off (`allowBackup: false`).
+- No analytics, no ads. Without cloud backup: no account and no network calls except the update check. Android backup is off (`allowBackup: false`).
+- Cloud backup is end-to-end encrypted: the Export JSON is encrypted on the phone with XChaCha20-Poly1305 (`@noble/ciphers`), with a key from the passphrase via scrypt (N=2^15, r=8). Supabase stores only the envelope, one row per account, with row level security. The derived key stays in the Keychain / Keystore; the sign-in session is kept in the encrypted database. A lost passphrase means the backup cannot be opened.
 - The widget gets only the saying text and its rating. Export files are deleted from the cache after sharing.
 
 ## Run it
@@ -28,12 +31,14 @@ Requires a development build (the widget, SQLCipher and the local Android module
 
 ```sh
 npm install                       # .npmrc sets legacy-peer-deps (Google Fonts react-dom peer)
-npm test                          # 60 Jest tests for the core logic
+npm test                          # 67 Jest tests for the core logic
 npm run typecheck && npm run lint
 npx expo run:ios                  # or: npx expo run:android, or eas build --profile development
 ```
 
 Then add the "Daily saying" widget from the home screen.
+
+For cloud backup during local dev, copy `.env.example` to `.env.local` and fill in the Supabase URL and publishable key.
 
 ### Build for your phone (EAS)
 
@@ -53,6 +58,28 @@ eas build -p ios --profile development      # dev client
 
 Each build ends with a link and QR code. Open it on the phone to install. On iPhone, also turn on Settings > Privacy & Security > Developer Mode for internal builds.
 
+### Two ways to work
+
+- **Development build + Metro** (at the laptop): `eas build -p android --profile development`, install, then `npx expo start`. Hot reload.
+- **Preview build + EAS Update** (daily use): `eas build -p android --profile preview`. Every push to `main` runs `.github/workflows/eas-update.yml`, which checks types and tests, then publishes to the `preview` channel. The app downloads it on start and uses it on the next start.
+
+The runtime version uses the `fingerprint` policy: a change to native code (new native package, plugin, widget layout) makes a new runtime, so old builds never get an update they cannot run. Those changes need a new build.
+
+### One-time setup (EAS Update and cloud backup)
+
+1. `git pull`, then `eas update:configure`. It adds `updates.url` and `extra.eas.projectId` to app.json. Commit and push.
+2. expo.dev > Account settings > Access tokens: create a token. In GitHub, repo Settings > Secrets and variables > Actions, add it as `EXPO_TOKEN`.
+3. Supabase (the Plants Watering project is fine, this only adds one table):
+   - SQL Editor: run `supabase/migrations/20261114000000_cbt_backups.sql`.
+   - Authentication > Emails: in the **Magic Link** and **Confirm signup** templates, add `Your code: {{ .Token }}` so the email has a 6-digit code. The link keeps working for the other app.
+4. Add the public values to EAS (used by builds and by `eas update --environment preview`):
+   ```sh
+   eas env:create --environment preview --name EXPO_PUBLIC_SUPABASE_URL --value https://<ref>.supabase.co --visibility plaintext
+   eas env:create --environment preview --name EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY --value sb_publishable_... --visibility plaintext
+   ```
+   Do the same for `development` if you use the dev build.
+5. Build once: `eas build -p android --profile preview` (and iOS if needed). From then on, JS changes ship by pushing to `main`.
+
 ## Layout
 
 ```
@@ -61,8 +88,10 @@ src/core/        pure logic, no React Native: tested with Jest
   quotes.ts      sayings, daily pick, ratings
   widgetSync.ts  widget props and reading ratings made on the widget
   migrate.ts     parse and merge the tracker's Export file
+  backup.ts      backup encryption (scrypt + XChaCha20-Poly1305), envelope, payload
   guide.ts       the in-app Guide; docs/guide.md is generated from it (npm run guide)
-src/data/        encrypted SQLite (db.ts) and the app store (store.tsx)
+src/data/        encrypted SQLite (db.ts), the app store (store.tsx), cloud backup (cloud.ts, backup.tsx)
+supabase/        SQL for the cbt_backups table with RLS
 src/widgets/     QuoteWidget.ios.tsx (SwiftUI), QuoteWidget.android.tsx (Glance), sync.ts
 src/app/         Expo Router screens
 modules/widget-props/  local Expo module (Android): reads the widget's stored props

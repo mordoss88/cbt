@@ -39,7 +39,8 @@ export default function AboutScreen() {
       <Panel title="Privacy">
         <Bullets items={[
           'Your data stays on this phone in an encrypted database. The key is kept in the phone\'s secure storage.',
-          'There is no account, no server, no ads, no tracking and no analytics.',
+          'No ads, no tracking and no analytics. Without cloud backup there is no account and nothing leaves the phone.',
+          'Cloud backup is optional. It is encrypted on this phone with your passphrase, so the server cannot read it.',
           'The home-screen widget gets only the saying of the day.',
         ]} />
       </Panel>
@@ -60,7 +61,7 @@ export default function AboutScreen() {
         <View style={{ height: 6 }} />
         {confirm ? (
           <View style={{ gap: 8, backgroundColor: C.pink, borderColor: C.ink, borderWidth: 2.5, borderRadius: 14, padding: 12 }}>
-            <P bold>Delete all entries, ladders, check-ins, self-checks, notes and ratings from this phone? This cannot be undone.</P>
+            <P bold>Delete all entries, ladders, check-ins, self-checks, notes and ratings from this phone? This cannot be undone. It also signs you out of cloud backup. To delete the cloud copy too, do that first in Cloud backup.</P>
             <Row>
               <Btn kind="danger" title="Yes, delete everything" onPress={async () => { await deleteAll(); router.back(); }} />
               <Btn kind="ghost" title="Cancel" onPress={() => setConfirm(false)} />

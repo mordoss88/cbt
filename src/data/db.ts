@@ -9,6 +9,8 @@ import { emptyQuoteState, type QuoteState } from '../core/quotes';
 
 export const DB_NAME = 'cbtlog.db';
 const KEY_NAME = 'cbtlog.dbkey.v1';
+/* The cloud backup key (made from the passphrase), so backups run without typing it each time. */
+export const BACKUP_KEY_NAME = 'cbtlog.backupkey.v1';
 const DB_VERSION = 1;
 
 export interface Settings {
@@ -126,4 +128,19 @@ export async function saveAll(db: SQLiteDatabase, data: AppData, quotes: QuoteSt
 
 export async function deleteEverything(db: SQLiteDatabase) {
   await db.execAsync('DELETE FROM records; DELETE FROM docs;');
+  // Also forget the backup key and the sign-in (it was in docs). The cloud copy is deleted separately.
+  await SecureStore.deleteItemAsync(BACKUP_KEY_NAME);
+}
+
+/* Raw text docs for the cloud backup: the Supabase sign-in session ("auth:" keys) and the backup state.
+   They live in this encrypted database, not in plain storage. */
+export async function getRaw(db: SQLiteDatabase, key: string): Promise<string | null> {
+  const row = await db.getFirstAsync<{ json: string }>('SELECT json FROM docs WHERE key = ?', key);
+  return row ? row.json : null;
+}
+export async function setRaw(db: SQLiteDatabase, key: string, value: string) {
+  await db.runAsync('INSERT OR REPLACE INTO docs (key, json) VALUES (?, ?)', key, value);
+}
+export async function removeRaw(db: SQLiteDatabase, key: string) {
+  await db.runAsync('DELETE FROM docs WHERE key = ?', key);
 }

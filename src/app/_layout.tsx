@@ -9,6 +9,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Suspense, useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { BackupProvider } from '../data/backup';
 import { DB_NAME, initDb } from '../data/db';
 import { StoreProvider } from '../data/store';
 import { C, F } from '../ui/theme';
@@ -46,6 +47,7 @@ export default function RootLayout() {
       <Suspense fallback={<Loading />}>
         <SQLiteProvider databaseName={DB_NAME} onInit={initDb} useSuspense>
           <StoreProvider>
+           <BackupProvider>
             <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: C.pageBot } }}>
               <Stack.Screen name="(tabs)" />
               <Stack.Screen name="record" options={{ ...modal, headerShown: true, title: 'Thought record' }} />
@@ -56,11 +58,13 @@ export default function RootLayout() {
               <Stack.Screen name="checkin" options={{ ...modal, headerShown: true, title: 'Weekly check-in' }} />
               <Stack.Screen name="test" options={{ ...modal, headerShown: true, title: 'Self-check' }} />
               <Stack.Screen name="import" options={{ ...modal, headerShown: true, title: 'Import from tracker' }} />
+              <Stack.Screen name="backup" options={{ ...modal, headerShown: true, title: 'Cloud backup' }} />
               <Stack.Screen name="about" options={{ ...modal, headerShown: true, title: 'About and privacy' }} />
               <Stack.Screen name="guide" options={{ ...modal, headerShown: true, title: 'How to use' }} />
               <Stack.Screen name="sayings" options={{ ...modal, headerShown: true, title: 'Your sayings' }} />
               <Stack.Screen name="quick-help" options={{ presentation: 'fullScreenModal', animation: 'fade' }} />
             </Stack>
+           </BackupProvider>
           </StoreProvider>
         </SQLiteProvider>
       </Suspense>

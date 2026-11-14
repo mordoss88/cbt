@@ -11,7 +11,7 @@ CBT Practice Log helps you practise CBT skills for anxiety: write down anxious m
 - **Thoughts**: write down anxious moments (thought records) or free text (journal).
 - **Ladder**: face fears in small steps, from easy to hard.
 - **Patterns**: your week, self-checks and what stands out in your entries.
-- **More**: your daily sayings, import and export, your country and privacy.
+- **More**: your daily sayings, import, cloud backup, export, your country and privacy.
 - **Quick help**: the pink button at the bottom of every screen. Open it during panic.
 
 ## Today: one saying and one small task
@@ -82,16 +82,33 @@ If you used the CBT Practice Log tracker on Claude, you can bring all your data 
 - You see what is in the file first. Tap **Import** to add it. Importing the same file again does not make copies.
 - The tracker keeps your data. Nothing there is changed or deleted.
 
+## Cloud backup: keep a safe copy
+
+Cloud backup keeps an encrypted copy of your data online, so you can get it back on a new phone. It is optional.
+
+- Open **More** and tap **Set up cloud backup**. Type your email and tap **Send me a code**, then type the code from the email.
+- Choose a passphrase of at least 10 characters. A short sentence only you know works well. Write it down somewhere safe.
+- Your data is encrypted on this phone with your passphrase before it is sent. The server only stores a locked file it cannot read.
+- The app backs up by itself when you leave the app, if something changed. You can also tap **Back up now**.
+- On a new phone: sign in with the same email and type your passphrase. Your data is added to the phone, nothing is deleted.
+- **If you forget the passphrase, nobody can open the backup.** Your data on the phone is not affected. You can delete the old backup and start a new one.
+
+## App updates
+
+Small improvements arrive by themselves. The app checks for an update when you open it and uses it the next time you open it. Bigger changes need a new install.
+
 ## The AI coach
 
 The chat coach from the tracker is not in the app yet. Your coach notes and chat history are imported and kept, so the coach can use them when it comes.
 
 ## Privacy and your data
 
-- Your data stays on this phone, in an encrypted database. There is no account and no server.
+- Your data stays on this phone, in an encrypted database. Without cloud backup there is no account and nothing leaves the phone.
+- With cloud backup, only an encrypted copy leaves the phone. Without your passphrase nobody can read it.
 - In **More** you can set your country, export all your data as a file, or delete everything.
 - No ads, no tracking, no analytics.
 
 ## What changed
 
+- **2026-11-14**: Cloud backup, encrypted on your phone with your passphrase. App updates arrive without a new install.
 - **2026-11-14**: The app: thought records, journal, ladders, patterns, self-checks and Quick help work offline on your phone. Import from the tracker. The saying of the day, with a home-screen widget where you rate it.
