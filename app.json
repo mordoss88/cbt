@@ -64,10 +64,11 @@
               },
               "android": {
                 "targetCellWidth": 4,
-                "targetCellHeight": 2,
+                "targetCellHeight": 1,
                 "minWidth": 250,
-                "minHeight": 110,
-                "initialLayout": "./src/widgets/QuoteWidget.android.tsx"
+                "minHeight": 80,
+                "initialLayout": "./src/widgets/QuoteWidget.android.tsx",
+                "resizeMode": "both"
               }
             }
           ]

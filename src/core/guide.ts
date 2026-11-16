@@ -6,7 +6,7 @@
 export type GuideBlock = string | string[];
 export interface GuideSection { id: string; title: string; blocks: GuideBlock[] }
 
-export const GUIDE_UPDATED = '2026-11-14';
+export const GUIDE_UPDATED = '2026-11-16';
 export const GUIDE: GuideSection[] = [
   { id: 'start', title: 'Start here', blocks: [
     'CBT Practice Log helps you practise CBT skills for anxiety: write down anxious moments, test your thoughts and face fears in small steps.',
@@ -23,7 +23,7 @@ export const GUIDE: GuideSection[] = [
   { id: 'widget', title: 'Home-screen widget: the saying of the day', blocks: [
     'Add the **Daily saying** widget to your home screen. It is part of this app, so you do not need another app.',
     ['iPhone: touch and hold the home screen, tap **Edit** then **Add Widget**, and pick CBT Practice Log.',
-      'Android: touch and hold the home screen, tap **Widgets**, and pick CBT Practice Log.',
+      'Android: touch and hold the home screen, tap **Widgets**, and pick CBT Practice Log. It takes one row. To make it bigger or smaller, touch and hold it and drag the edges.',
       'Tap **Helps** or **Not for me** on the widget to rate the saying. The rating is saved in the app the next time you open it.',
       'On iPhone, tap the saying to open the app. Quick help is one tap away there.',
       'The widget shows only the saying. Your entries never appear on the home screen.'] ] },
@@ -76,6 +76,7 @@ export const GUIDE: GuideSection[] = [
       'No ads, no tracking, no analytics.'] ] },
 ];
 export const GUIDE_CHANGES: [string, string][] = [
+  ['2026-11-16', 'The Android widget is smaller: one row on the home screen, and you can resize it.'],
   ['2026-11-14', 'Cloud backup, encrypted on your phone with your passphrase. App updates arrive without a new install.'],
   ['2026-11-14', 'The app: thought records, journal, ladders, patterns, self-checks and Quick help work offline on your phone. Import from the tracker. The saying of the day, with a home-screen widget where you rate it.'],
 ];
