@@ -19,6 +19,22 @@ describe('quotes', () => {
     expect(QUOTES[0].text).toMatch(/I can't.*I can/);
   });
 
+  test('sayings focus on procrastination and social anxiety, and fit two widget lines', () => {
+    const p = QUOTES.filter((q) => q.id.startsWith('p')).length;
+    const s = QUOTES.filter((q) => q.id.startsWith('s')).length;
+    expect(p).toBeGreaterThanOrEqual(15);
+    expect(s).toBeGreaterThanOrEqual(15);
+    for (const q of QUOTES) expect(q.text.length).toBeLessThanOrEqual(78);
+  });
+
+  test('a rating for a saying that was removed does no harm', () => {
+    let s = emptyQuoteState();
+    s = { ...s, ratings: { q02: { id: 'q02', rating: 'up', at: '2026-11-10T00:00:00Z' } }, shown: [{ day: '2026-11-16', id: 'q02' }] };
+    expect(quoteById(pickQuote('2026-11-16', s).id)).not.toBeNull();
+    expect(ratedList(s, 'up')).toEqual([]);
+    expect(rateQuote(emptyQuoteState(), 'q02', 'up', '2026-11-16T00:00:00Z')).toEqual(emptyQuoteState());
+  });
+
   test('the same day gives the same quote', () => {
     const s = emptyQuoteState();
     expect(pickQuote('2026-11-14', s).id).toBe(pickQuote('2026-11-14', s).id);
@@ -93,10 +109,10 @@ describe('quotes', () => {
 
   test('ratedList lists the newest first', () => {
     let s = emptyQuoteState();
-    s = rateQuote(s, 'q02', 'up', '2026-11-10T00:00:00Z');
-    s = rateQuote(s, 'q03', 'up', '2026-11-12T00:00:00Z');
+    s = rateQuote(s, 'p01', 'up', '2026-11-10T00:00:00Z');
+    s = rateQuote(s, 's01', 'up', '2026-11-12T00:00:00Z');
     s = rateQuote(s, 'q04', 'down', '2026-11-11T00:00:00Z');
-    expect(ratedList(s, 'up').map((r) => r.id)).toEqual(['q03', 'q02']);
+    expect(ratedList(s, 'up').map((r) => r.id)).toEqual(['s01', 'p01']);
     expect(ratedList(s, 'down')[0].quote.id).toBe('q04');
   });
 });
@@ -104,11 +120,11 @@ describe('quotes', () => {
 describe('widget sync', () => {
   test('widgetProps carries the quote, the saved rating and an empty pending list', () => {
     let s = emptyQuoteState();
-    s = rateQuote(s, 'q05', 'up', '2026-11-14T00:00:00Z');
-    expect(widgetProps(quoteById('q05')!, '2026-11-14', s)).toEqual({
-      quoteId: 'q05', text: quoteById('q05')!.text, day: '2026-11-14', rating: 'up', pending: '', url: 'cbtlog://today',
+    s = rateQuote(s, 'p02', 'up', '2026-11-14T00:00:00Z');
+    expect(widgetProps(quoteById('p02')!, '2026-11-14', s)).toEqual({
+      quoteId: 'p02', text: quoteById('p02')!.text, day: '2026-11-14', rating: 'up', pending: '', url: 'cbtlog://today',
     });
-    expect(widgetProps(quoteById('q06')!, '2026-11-14', s).rating).toBe('');
+    expect(widgetProps(quoteById('s02')!, '2026-11-14', s).rating).toBe('');
   });
 
   test('parsePending reads widget taps and skips broken parts', () => {

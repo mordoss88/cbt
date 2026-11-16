@@ -1,20 +1,28 @@
-/* Import from tracker: pick the tracker's Export file, preview what is in it, then merge it in.
-   The file is read on the phone. Nothing is sent anywhere, and nothing in the tracker changes. */
+/* Import from tracker: paste the text from the tracker's "Copy all my data", or pick its Export file.
+   Preview what is in it, then merge it in. It is read on the phone. Nothing is sent anywhere,
+   and nothing in the tracker changes. */
 import * as DocumentPicker from 'expo-document-picker';
 import { File } from 'expo-file-system';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useRef, useState, type ComponentRef } from 'react';
+import { TextInput } from 'react-native';
 import { parseTrackerExport, type ParseResult } from '../core/migrate';
 import { useStore } from '../data/store';
 import { fmtWhen } from '../ui/copy';
 import { Btn, Bullets, P, Page, Panel, Row } from '../ui/kit';
-import { C } from '../ui/theme';
+import { C, F } from '../ui/theme';
 
 export default function ImportScreen() {
   const { importData } = useStore();
   const [parsed, setParsed] = useState<ParseResult | null>(null);
   const [done, setDone] = useState<{ added: number; updated: number } | null>(null);
   const [busy, setBusy] = useState(false);
+  // The pasted export can be large, so the field is not controlled: the text lives in a ref.
+  const pasted = useRef('');
+  const input = useRef<ComponentRef<typeof TextInput>>(null);
+  const [hasPaste, setHasPaste] = useState(false);
+
+  const readPaste = () => setParsed(parseTrackerExport(pasted.current));
 
   const pick = async () => {
     const res = await DocumentPicker.getDocumentAsync({ type: ['application/json', 'text/plain', '*/*'], copyToCacheDirectory: true, multiple: false });
@@ -41,16 +49,26 @@ export default function ImportScreen() {
 
   return (
     <Page>
-      <Panel title="1 · Export from the tracker">
+      <Panel title="1 · Copy from the tracker">
         <Bullets items={[
-          'Open the CBT Practice Log tracker on Claude.',
+          'Open the CBT Practice Log tracker in the Claude app.',
           'Scroll to the bottom and open **About, privacy and your data**.',
-          'Tap **Export** and save the file on this phone (for example in Files or Downloads).',
+          'Tap **Copy all my data**. If a box with the text opens instead, select all of it and copy it.',
         ]} />
       </Panel>
-      <Panel title="2 · Pick the file here">
-        <Btn kind="primary" title="Choose the export file" onPress={pick} />
-        <P muted>The file is read on this phone only.</P>
+      <Panel title="2 · Paste it here">
+        <TextInput ref={input} multiline placeholder="Long-press here and tap Paste" placeholderTextColor={C.inkSoft}
+          accessibilityLabel="Paste the text from the tracker" autoCorrect={false} autoCapitalize="none" spellCheck={false}
+          onChangeText={(t) => { pasted.current = t; setHasPaste(!!t.trim()); }}
+          style={{ fontFamily: F.body, fontSize: 13, color: C.ink, backgroundColor: C.paper, borderColor: C.ink, borderWidth: 2.5,
+            borderRadius: 12, padding: 12, height: 120, textAlignVertical: 'top' }} />
+        <Row>
+          <Btn kind="primary" title="Read the pasted text" disabled={!hasPaste} onPress={readPaste} />
+          {hasPaste ? <Btn kind="ghost" title="Clear" onPress={() => { input.current?.clear(); pasted.current = ''; setHasPaste(false); setParsed(null); }} /> : null}
+        </Row>
+        <P muted>Or, if you saved the Export file on this phone:</P>
+        <Btn title="Choose the export file" onPress={pick} />
+        <P muted>The text is read on this phone only.</P>
       </Panel>
       {parsed && !parsed.ok ? <Panel bg={C.pink}><P bold>{parsed.error}</P></Panel> : null}
       {parsed && parsed.ok ? (
@@ -70,7 +88,7 @@ export default function ImportScreen() {
               setBusy(true);
               try { setDone(await importData(parsed.data, parsed.quoteRatings)); } finally { setBusy(false); }
             }} />
-            <Btn kind="ghost" title="Pick another file" onPress={pick} />
+            <Btn kind="ghost" title="Choose a file instead" onPress={pick} />
           </Row>
         </Panel>
       ) : null}

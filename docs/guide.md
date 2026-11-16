@@ -18,6 +18,7 @@ CBT Practice Log helps you practise CBT skills for anxiety: write down anxious m
 
 At the top of Thoughts you see the saying of the day and one small task, for example the weekly check-in, Part 2 of an entry, or your next ladder step.
 
+- Most sayings are about putting things off (procrastination) and about social anxiety. Each one has a short line on the CBT idea behind it.
 - Tap **Helps** or **Not for me** under the saying. Sayings that help come back more often. Sayings you mark "Not for me" do not come back.
 - Tap the main button of the task to do it. Tap **Not today** to hide it. Skipping a day is fine.
 
@@ -77,8 +78,9 @@ The pink **Quick help** button is on every screen.
 
 If you used the CBT Practice Log tracker on Claude, you can bring all your data into the app.
 
-- In the tracker, open **About, privacy and your data** and tap **Export**. Save the file on your phone.
-- In the app, open **More**, tap **Import from tracker** and pick the file.
+- In the tracker (in the Claude app), open **About, privacy and your data** and tap **Copy all my data**. If a box with the text opens instead, select all of it and copy it.
+- In the app, open **More**, tap **Import from tracker**, long-press the box, tap **Paste**, then tap **Read the pasted text**.
+- If you saved the tracker's **Export** file on your phone, you can tap **Choose the export file** instead.
 - You see what is in the file first. Tap **Import** to add it. Importing the same file again does not make copies.
 - The tracker keeps your data. Nothing there is changed or deleted.
 
@@ -110,6 +112,7 @@ The chat coach from the tracker is not in the app yet. Your coach notes and chat
 
 ## What changed
 
+- **2026-11-16**: Move your data by copy and paste: **Copy all my data** in the tracker, then paste it in Import. New sayings about procrastination and social anxiety.
 - **2026-11-16**: The Android widget is smaller: one row on the home screen, and you can resize it.
 - **2026-11-14**: Cloud backup, encrypted on your phone with your passphrase. App updates arrive without a new install.
 - **2026-11-14**: The app: thought records, journal, ladders, patterns, self-checks and Quick help work offline on your phone. Import from the tracker. The saying of the day, with a home-screen widget where you rate it.

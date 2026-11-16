@@ -128,3 +128,36 @@ describe('mergeImport', () => {
     expect(summary.updated).toBe(1);
   });
 });
+
+describe('pasted text from the tracker', () => {
+  const text = JSON.stringify(trackerExport, null, 2);
+
+  test('reads the export with a BOM, words or a code fence around it', () => {
+    for (const t of ['﻿' + text, 'Here is my data:\n' + text + '\nthanks', '```json\n' + text + '\n```', '   ' + text + '\n\n']) {
+      const r = parseTrackerExport(t);
+      expect(r.ok).toBe(true);
+      if (r.ok) expect(r.counts).toMatchObject({ records: 2, journal: 1, steps: 2, ladders: 2 });
+    }
+  });
+
+  test('reads it when the keyboard turned spaces into non-breaking spaces', () => {
+    const r = parseTrackerExport(text.replace(/\n {2}/g, '\n  '));
+    expect(r.ok).toBe(true);
+  });
+
+  test('says clearly when the paste is empty or cut short', () => {
+    expect(parseTrackerExport('')).toMatchObject({ ok: false, error: expect.stringMatching(/Paste the text/) });
+    expect(parseTrackerExport(text.slice(0, text.length / 2))).toMatchObject({ ok: false, error: expect.stringMatching(/not a whole/) });
+  });
+
+  test('a pasted export maps to the same data as the file', () => {
+    const fromFile = parseTrackerExport(JSON.stringify(trackerExport));
+    const fromPaste = parseTrackerExport('Copied:\n' + text);
+    expect(fromPaste).toEqual(fromFile);
+    if (!fromPaste.ok) return;
+    const { data, summary } = mergeImport(emptyData(), fromPaste.data);
+    expect(data.ladders.map((l) => l.name)).toEqual(expect.arrayContaining(['Social', 'Driving']));
+    expect(data.records.find((r) => r.id === 'j1')?.text).toBe('A calm evening drive with Dad.');
+    expect(summary.added).toBeGreaterThan(0);
+  });
+});

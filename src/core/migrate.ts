@@ -55,10 +55,33 @@ function cleanStep(s: Record<string, any>): LadderStep | null {
   return out;
 }
 
+/* Find the export in pasted or saved text. Copying on a phone can add a BOM, a few words or a code fence
+   around it, and some keyboards turn the copied spaces into non-breaking ones. */
+export function extractExportJson(text: string): string | null {
+  const t = String(text ?? '').replace(/^\uFEFF/, '').trim();
+  if (!t) return null;
+  if (t.startsWith('{')) {
+    try { JSON.parse(t); return t; } catch { /* look for the object below */ }
+  }
+  const start = t.indexOf('{'), end = t.lastIndexOf('}');
+  if (start < 0 || end <= start) return null;
+  const inner = t.slice(start, end + 1);
+  for (const candidate of [inner, inner.replace(/\u00A0/g, ' ')]) {
+    try { JSON.parse(candidate); return candidate; } catch { /* try the next one */ }
+  }
+  return null;
+}
+
 export function parseTrackerExport(text: string): ParseResult {
   let o: unknown;
+  const json = extractExportJson(text);
+  if (!json) {
+    return String(text ?? '').trim()
+      ? { ok: false, error: 'This is not a whole CBT Practice Log export. Copy all of it in the tracker (Copy all my data) and paste again.' }
+      : { ok: false, error: 'Nothing to import yet. Paste the text from the tracker first.' };
+  }
   try {
-    o = JSON.parse(text);
+    o = JSON.parse(json);
   } catch {
     return { ok: false, error: 'This file is not a CBT Practice Log export. Use Export in the tracker and pick that file.' };
   }
