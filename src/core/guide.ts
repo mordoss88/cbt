@@ -54,7 +54,7 @@ export const GUIDE: GuideSection[] = [
       'When to get medical help, emergency numbers and crisis lines for your country.', '**Log this moment** opens a new entry when the wave has passed.'] ] },
   { id: 'import', title: 'Move your data from the tracker', blocks: [
     'If you used the CBT Practice Log tracker on Claude, you can bring all your data into the app.',
-    ['In the tracker (in the Claude app), open **About, privacy and your data** and tap **Copy all my data**. If a box with the text opens instead, select all of it and copy it.',
+    ['In the tracker (in the Claude app), wait until your entries show, then tap **Copy data** at the top, next to Guide. If a box with the text opens instead, select all of it and copy it.',
       'In the app, open **More**, tap **Import from tracker**, long-press the box, tap **Paste**, then tap **Read the pasted text**.',
       'If you saved the tracker\'s **Export** file on your phone, you can tap **Choose the export file** instead.',
       'You see what is in the file first. Tap **Import** to add it. Importing the same file again does not make copies.',

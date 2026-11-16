@@ -52,8 +52,8 @@ export default function ImportScreen() {
       <Panel title="1 · Copy from the tracker">
         <Bullets items={[
           'Open the CBT Practice Log tracker in the Claude app.',
-          'Scroll to the bottom and open **About, privacy and your data**.',
-          'Tap **Copy all my data**. If a box with the text opens instead, select all of it and copy it.',
+          'Wait until your entries show, then tap **Copy data** at the top, next to Guide.',
+          'If a box with the text opens instead, tap **Copy again**, or select all of it and copy it.',
         ]} />
       </Panel>
       <Panel title="2 · Paste it here">
