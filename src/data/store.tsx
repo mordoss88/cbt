@@ -6,7 +6,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useR
 import { AppState } from 'react-native';
 import { DEFAULT_LADDER, guessCountry, ladderList } from '../core/cbt';
 import { mergeImport } from '../core/migrate';
-import { emptyQuoteState, rateQuote, type QuoteRating, type QuoteRatingEntry, type QuoteState } from '../core/quotes';
+import { emptyQuoteState, rateQuote, setSayingSet, type QuoteRating, type SayingSet, type QuoteRatingEntry, type QuoteState } from '../core/quotes';
 import { emptyData, type AppData, type Checkin, type Ladder, type LadderStep, type LadderTry, type TestResult, type ThoughtRecord } from '../core/types';
 import { listenToWidget, pullWidgetRatings, pushWidget } from '../widgets/sync';
 import * as DB from './db';
@@ -27,6 +27,7 @@ interface Store {
   addCheckin(c: Omit<Checkin, 'at'>): Promise<void>;
   addTest(t: Omit<TestResult, 'at'>): Promise<void>;
   rate(id: string, rating: QuoteRating | null): Promise<void>;
+  setSayings(set: SayingSet): Promise<void>;
   setSettings(s: Partial<DB.Settings>): Promise<void>;
   importData(inc: AppData, quoteRatings: QuoteRatingEntry[]): Promise<{ added: number; updated: number }>;
   deleteAll(): Promise<void>;
@@ -152,6 +153,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     async rate(id, rating) {
       await commitQuotes(rateQuote(quotesRef.current, id, rating, nowIso(), 'app'));
       pushWidget(quotesRef.current);
+    },
+    async setSayings(set) {
+      // Today's saying and the widget change right away when today's saying is not in the new set.
+      await commitQuotes(pushWidget(setSayingSet(quotesRef.current, set)));
     },
     async setSettings(s) {
       const next = { ...settings, ...s };

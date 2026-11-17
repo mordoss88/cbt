@@ -5,9 +5,8 @@
 import { Platform } from 'react-native';
 import { addUserInteractionListener } from 'expo-widgets';
 import { getWidgetPropsJson } from '../../modules/widget-props';
-import { dayKey } from '../core/cbt';
 import { pickQuote, pinQuote, type QuoteState } from '../core/quotes';
-import { WIDGET_NAME, mergeWidgetRatings, widgetProps, type QuoteWidgetProps } from '../core/widgetSync';
+import { WIDGET_NAME, mergeWidgetRatings, nextDayKeys, widgetProps, widgetSchedule, type QuoteWidgetProps } from '../core/widgetSync';
 import QuoteWidget from './QuoteWidget';
 
 const native = Platform.OS === 'ios' || Platform.OS === 'android';
@@ -27,26 +26,26 @@ export async function pullWidgetRatings(state: QuoteState) {
   return mergeWidgetRatings(state, await readWidgetProps());
 }
 
-/* Pins today's saying (and on iOS the next 6 days) and pushes it to the widget. Returns the new quote state. */
+/* Pins today's saying and pushes today and the next 13 days to the widget, so it changes daily without the app.
+   iOS gets a timeline entry for each midnight. Android gets the list and picks today's entry when it draws.
+   Returns the new quote state. */
 export function pushWidget(state: QuoteState, now = Date.now()): QuoteState {
-  const today = dayKey(now);
+  const keys = nextDayKeys(now);
+  const today = keys[0];
   const next = pinQuote(state, today).state;
   if (!native) return next;
   try {
+    // Future days are picked but not pinned, so a rating made before then can still change them.
+    const days = widgetSchedule(next, keys);
+    const props = widgetProps(pickQuote(today, next), today, next, days);
     if (Platform.OS === 'ios') {
-      const entries: { date: Date; props: QuoteWidgetProps }[] = [];
-      for (let i = 0; i < 7; i++) {
+      QuoteWidget.updateTimeline(days.map(([day, id, text, rating], i) => {
         const d = new Date(now);
-        d.setDate(d.getDate() + i);
-        if (i > 0) d.setHours(0, 0, 5, 0);
-        const day = dayKey(d);
-        // Future days are picked but not pinned, so a rating made before then can still change them.
-        const q = pickQuote(day, next);
-        entries.push({ date: i === 0 ? new Date(now) : d, props: widgetProps(q, day, next) });
-      }
-      QuoteWidget.updateTimeline(entries);
+        if (i > 0) { d.setDate(d.getDate() + i); d.setHours(0, 0, 5, 0); }
+        return { date: d, props: { ...props, quoteId: id, text, day, rating } };
+      }));
     } else {
-      QuoteWidget.updateSnapshot(widgetProps(pickQuote(today, next), today, next));
+      QuoteWidget.updateSnapshot(props);
     }
   } catch {
     // The widget is optional. The app works the same without it.

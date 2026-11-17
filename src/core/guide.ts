@@ -6,7 +6,7 @@
 export type GuideBlock = string | string[];
 export interface GuideSection { id: string; title: string; blocks: GuideBlock[] }
 
-export const GUIDE_UPDATED = '2026-11-16';
+export const GUIDE_UPDATED = '2026-11-17';
 export const GUIDE: GuideSection[] = [
   { id: 'start', title: 'Start here', blocks: [
     'CBT Practice Log helps you practise CBT skills for anxiety: write down anxious moments, test your thoughts and face fears in small steps.',
@@ -19,12 +19,14 @@ export const GUIDE: GuideSection[] = [
   { id: 'today', title: 'Today: one saying and one small task', blocks: [
     'At the top of Thoughts you see the saying of the day and one small task, for example the weekly check-in, Part 2 of an entry, or your next ladder step.',
     ['Most sayings are about putting things off (procrastination) and about social anxiety. Each one has a short line on the CBT idea behind it.',
+      'To get only one kind, tap **Your sayings** under the saying and pick **Both**, **Putting things off** or **Social anxiety**. Today\'s saying and the widget change right away.',
       'Tap **Helps** or **Not for me** under the saying. Sayings that help come back more often. Sayings you mark "Not for me" do not come back.',
       'Tap the main button of the task to do it. Tap **Not today** to hide it. Skipping a day is fine.'] ] },
   { id: 'widget', title: 'Home-screen widget: the saying of the day', blocks: [
     'Add the **Daily saying** widget to your home screen. It is part of this app, so you do not need another app.',
     ['iPhone: touch and hold the home screen, tap **Edit** then **Add Widget**, and pick CBT Practice Log.',
       'Android: touch and hold the home screen, tap **Widgets**, and pick CBT Practice Log. It takes one row. To make it bigger or smaller, touch and hold it and drag the edges.',
+      'The saying changes every day, also when you do not open the app. On Android it can take up to an hour after midnight. The app sends the next 14 days at a time, so open it at least once every two weeks.',
       'Tap **Helps** or **Not for me** on the widget to rate the saying. The rating is saved in the app the next time you open it.',
       'On iPhone, tap the saying to open the app. Quick help is one tap away there.',
       'The widget shows only the saying. Your entries never appear on the home screen.'] ] },
@@ -78,6 +80,7 @@ export const GUIDE: GuideSection[] = [
       'No ads, no tracking, no analytics.'] ] },
 ];
 export const GUIDE_CHANGES: [string, string][] = [
+  ['2026-11-17', 'The widget shows a new saying every day, even when the app stays closed. Pick the kind of sayings: both, putting things off, or social anxiety.'],
   ['2026-11-16', 'Move your data by copy and paste: **Copy all my data** in the tracker, then paste it in Import. New sayings about procrastination and social anxiety.'],
   ['2026-11-16', 'The Android widget is smaller: one row on the home screen, and you can resize it.'],
   ['2026-11-14', 'Cloud backup, encrypted on your phone with your passphrase. App updates arrive without a new install.'],

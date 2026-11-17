@@ -2,7 +2,11 @@
    A tap on "Helps" or "Not for me" in the widget runs in the widget runtime (no app needed): it sets `rating`
    and appends "<quoteId>:<rating>:<ms>" to `pending`. When the app opens it reads the props back,
    saves each pending rating, and pushes fresh props with an empty `pending`. */
-import { quoteById, rateQuote, type Quote, type QuoteRating, type QuoteState } from './quotes';
+import { dayKey } from './cbt';
+import { pinQuote, quoteById, rateQuote, type Quote, type QuoteRating, type QuoteState } from './quotes';
+
+/* One day on the widget: [day, quote id, text, rating]. */
+export type WidgetDay = [string, string, string, '' | QuoteRating];
 
 export interface QuoteWidgetProps {
   quoteId: string;
@@ -11,13 +15,39 @@ export interface QuoteWidgetProps {
   rating: '' | QuoteRating;
   pending: string;
   url: string;
+  /* JSON of WidgetDay[] for today and the next days. The Android widget picks today's entry itself
+     each time it draws (about once an hour), so the saying changes at midnight without the app. */
+  days?: string;
 }
+
+export const WIDGET_DAYS = 14;
 
 export const WIDGET_NAME = 'QuoteWidget';
 export const WIDGET_URL = 'cbtlog://today';
 
-export function widgetProps(quote: Quote, day: string, state: QuoteState): QuoteWidgetProps {
-  return { quoteId: quote.id, text: quote.text, day, rating: state.ratings[quote.id]?.rating ?? '', pending: '', url: WIDGET_URL };
+export function widgetProps(quote: Quote, day: string, state: QuoteState, days?: WidgetDay[]): QuoteWidgetProps {
+  const p: QuoteWidgetProps = { quoteId: quote.id, text: quote.text, day, rating: state.ratings[quote.id]?.rating ?? '', pending: '', url: WIDGET_URL };
+  if (days) p.days = JSON.stringify(days);
+  return p;
+}
+
+/* The next days in order, starting with `days[0]`. Each day is picked as if the days before it were shown,
+   so the 14-day no-repeat rule holds. Only the state passed in is used: nothing is pinned for real. */
+export function widgetSchedule(state: QuoteState, dayKeys: string[]): WidgetDay[] {
+  let s = state;
+  return dayKeys.map((day) => {
+    const r = pinQuote(s, day);
+    s = r.state;
+    return [day, r.quote.id, r.quote.text, state.ratings[r.quote.id]?.rating ?? ''] as WidgetDay;
+  });
+}
+
+/* The entry to show on `today`: that day, else the last day before it, else the first. Same rule as in the widget. */
+export function widgetDayFor(days: WidgetDay[], today: string): WidgetDay | null {
+  if (!days.length) return null;
+  let best: WidgetDay | null = null;
+  for (const d of days) if (d[0] <= today) best = d;
+  return best ?? days[0];
 }
 
 export function parsePending(pending: unknown): { id: string; rating: QuoteRating; at: string }[] {
@@ -41,4 +71,16 @@ export function mergeWidgetRatings(state: QuoteState, propsList: (Partial<QuoteW
     if (next !== before) added++;
   }
   return { state: next, added };
+}
+
+/* The day keys for today and the next days, in local time. */
+export function nextDayKeys(now: number, n = WIDGET_DAYS) {
+  const out: string[] = [];
+  for (let i = 0; i < n; i++) {
+    const d = new Date(now);
+    d.setHours(12, 0, 0, 0);
+    d.setDate(d.getDate() + i);
+    out.push(dayKey(d.getTime()));
+  }
+  return out;
 }

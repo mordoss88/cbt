@@ -74,6 +74,7 @@
           ]
         }
       ],
+      "./plugins/with-widget-refresh",
       "expo-updates"
     ],
     "scheme": "cbtlog",
