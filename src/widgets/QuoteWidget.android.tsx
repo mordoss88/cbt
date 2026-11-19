@@ -3,7 +3,7 @@
    Compact: one row of the home screen (4x1, resizable). The saying (2 lines, sayings are at most 78 characters) and two small buttons.
    Android widgets support only Box, Column, Row, Spacer, Text and the button components, and a few modifiers.
    The function body runs in the widget runtime: no hooks, no runtime imports, no outside constants. */
-import { Button, Column, OutlinedButton, Row, Spacer, Text } from '@expo/ui/jetpack-compose';
+import { Button, Column, Row, Spacer, Text } from '@expo/ui/jetpack-compose';
 import { background, cornerRadius, fillMaxSize, fillMaxWidth, height, padding, width } from '@expo/ui/jetpack-compose/modifiers';
 import { createWidget } from 'expo-widgets';
 import type { QuoteWidgetProps } from '../core/widgetSync';
@@ -29,37 +29,35 @@ const QuoteWidget = (props: QuoteWidgetProps) => {
     days: entry ? JSON.stringify(days.map((d) => (d[1] === quoteId ? [d[0], d[1], d[2], rating] : d))) : props.days,
     pending: (props.pending ? props.pending + ';' : '') + quoteId + ':' + rating + ':' + Date.now(),
   });
+  // Buttons draw their own colored pill: a Row inside the button, so the label is a real Text with our color.
+  // (A button with only a Text child becomes a Glance button whose label color can match its own background,
+  // which showed as blank teal and red pills on the phone.)
   // `target` names the button for the press handler and the app's interaction listener.
-  const targetUp: any = { target: 'rate-up', modifiers: [height(34)] };
-  const targetDown: any = { target: 'rate-down', modifiers: [height(34)] };
+  const pill = (on: boolean, color: string, target: string): any => ({
+    target,
+    colors: { containerColor: on ? color : '#FFF4D6', contentColor: on ? '#FFFFFF' : color },
+    modifiers: [height(32), cornerRadius(16)],
+  });
   const upOn = shownRating === 'up';
   const downOn = shownRating === 'down';
 
   return (
-    <Column modifiers={[fillMaxSize(), background('#FFD36E'), cornerRadius(18), padding(12, 8, 12, 8)]}>
+    <Column verticalArrangement="center" modifiers={[fillMaxSize(), background('#FFD36E'), cornerRadius(18), padding(12, 6, 12, 6)]}>
       <Text color={ink} maxLines={2} style={{ fontSize: 15, fontWeight: 'bold' }}>{text}</Text>
-      <Spacer modifiers={[height(4)]} />
+      <Spacer modifiers={[height(6)]} />
       {quoteId ? (
         <Row modifiers={[fillMaxWidth()]}>
-          {upOn ? (
-            <Button {...targetUp} colors={{ containerColor: '#1F7F72', contentColor: '#FFFFFF' }} onClick={(() => rate('up')) as any}>
-              <Text>Helps ✓</Text>
-            </Button>
-          ) : (
-            <OutlinedButton {...targetUp} colors={{ contentColor: '#1F7F72' }} onClick={(() => rate('up')) as any}>
-              <Text>Helps</Text>
-            </OutlinedButton>
-          )}
+          <Button {...pill(upOn, '#1F7F72', 'rate-up')} onClick={(() => rate('up')) as any}>
+            <Row verticalAlignment="center" modifiers={[height(32), padding(14, 0, 14, 0)]}>
+              <Text color={upOn ? '#FFFFFF' : '#1F7F72'} style={{ fontSize: 13, fontWeight: 'bold' }}>{upOn ? 'Helps ✓' : 'Helps'}</Text>
+            </Row>
+          </Button>
           <Spacer modifiers={[width(8)]} />
-          {downOn ? (
-            <Button {...targetDown} colors={{ containerColor: '#8A1C30', contentColor: '#FFFFFF' }} onClick={(() => rate('down')) as any}>
-              <Text>Not for me ✓</Text>
-            </Button>
-          ) : (
-            <OutlinedButton {...targetDown} colors={{ contentColor: '#8A1C30' }} onClick={(() => rate('down')) as any}>
-              <Text>Not for me</Text>
-            </OutlinedButton>
-          )}
+          <Button {...pill(downOn, '#8A1C30', 'rate-down')} onClick={(() => rate('down')) as any}>
+            <Row verticalAlignment="center" modifiers={[height(32), padding(14, 0, 14, 0)]}>
+              <Text color={downOn ? '#FFFFFF' : '#8A1C30'} style={{ fontSize: 13, fontWeight: 'bold' }}>{downOn ? 'Not for me ✓' : 'Not for me'}</Text>
+            </Row>
+          </Button>
         </Row>
       ) : null}
     </Column>

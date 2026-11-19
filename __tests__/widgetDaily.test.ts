@@ -101,6 +101,23 @@ describe('the Android widget picks the day itself', () => {
     expect(texts(AndroidWidget(next))).toContain('Helps ✓');
   });
 
+  test('each button label is its own Text with a color that differs from the pill (blank pills on the phone)', () => {
+    jest.useFakeTimers().setSystemTime(NOW);
+    for (const tree of [AndroidWidget(props), AndroidWidget({ ...props, days: JSON.stringify(days.map((d) => [d[0], d[1], d[2], 'up'])) })]) {
+      const buttons = findButtons(tree);
+      expect(buttons).toHaveLength(2);
+      for (const b of buttons) {
+        expect(b.type).toBe('Button');
+        expect(b.props.target).toMatch(/^rate-(up|down)$/);
+        const inner = b.props.children;
+        expect(inner.type).toBe('Row'); // not a bare Text, so expo-widgets draws our Text, not a Glance button label
+        const label = inner.props.children;
+        expect(label.type).toBe('Text');
+        expect(label.props.color).not.toBe(b.props.colors.containerColor);
+      }
+    }
+  });
+
   test('old props without a list still work', () => {
     const { days: _d, ...old } = props;
     expect(texts(AndroidWidget(old))).toContain(props.text);
