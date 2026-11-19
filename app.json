@@ -75,7 +75,18 @@
         }
       ],
       "./plugins/with-widget-refresh",
-      "expo-updates"
+      "expo-updates",
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Allow $(PRODUCT_NAME) to use the microphone, so you can speak your entries. Speech is turned into text on your phone.",
+          "speechRecognitionPermission": "Allow $(PRODUCT_NAME) to turn your speech into text on your phone.",
+          "androidSpeechServicePackages": [
+            "com.google.android.as",
+            "com.google.android.googlequicksearchbox"
+          ]
+        }
+      ]
     ],
     "scheme": "cbtlog",
     "splash": {

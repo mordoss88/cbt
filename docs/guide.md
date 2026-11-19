@@ -1,6 +1,6 @@
 # CBT Practice Log app: how to use it
 
-_Updated 2026-11-17. Also in the app: open **More** and tap **Guide**._
+_Updated 2026-11-19. Also in the app: open **More** and tap **Guide**._
 
 ## Start here
 
@@ -43,7 +43,10 @@ Tap **+ Thought record**. It has two parts.
 
 Tap **+ Journal** when you just want to write. A journal entry has no Part 2.
 
-Tip: to dictate, tap the microphone on your keyboard.
+To speak instead of type, tap **Speak** above a text box. Your words appear as you talk. Tap **Listening… tap to stop** when you are done.
+
+- Speech is turned into text on your phone. Nothing you say leaves the phone. If your phone cannot do that, the app tells you and voice input stays off. Then use the microphone on your keyboard.
+- The first time, Android may ask you to download the offline speech pack for your language. Tap **Download**.
 
 ## Re-rate your anxiety after you calm down
 
@@ -110,10 +113,12 @@ The chat coach from the tracker is not in the app yet. Your coach notes and chat
 - Your data stays on this phone, in an encrypted database. Without cloud backup there is no account and nothing leaves the phone.
 - With cloud backup, only an encrypted copy leaves the phone. Without your passphrase nobody can read it.
 - In **More** you can set your country, export all your data as a file, or delete everything.
+- Voice input runs on the phone only. Your voice and the text never go to a server.
 - No ads, no tracking, no analytics.
 
 ## What changed
 
+- **2026-11-19**: Speak your entries: a **Speak** button on text boxes, on the phone only. The widget buttons show their labels again.
 - **2026-11-17**: The widget shows a new saying every day, even when the app stays closed. Pick the kind of sayings: both, putting things off, or social anxiety.
 - **2026-11-16**: Move your data by copy and paste: **Copy all my data** in the tracker, then paste it in Import. New sayings about procrastination and social anxiety.
 - **2026-11-16**: The Android widget is smaller: one row on the home screen, and you can resize it.

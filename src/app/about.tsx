@@ -42,6 +42,7 @@ export default function AboutScreen() {
           'No ads, no tracking and no analytics. Without cloud backup there is no account and nothing leaves the phone.',
           'Cloud backup is optional. It is encrypted on this phone with your passphrase, so the server cannot read it.',
           'The home-screen widget gets only the saying of the day.',
+          'Voice input (Speak) turns speech into text on this phone only. If the phone cannot, voice input stays off. Nothing you say is sent anywhere.',
         ]} />
       </Panel>
       <Panel title="Your country, for the help numbers">

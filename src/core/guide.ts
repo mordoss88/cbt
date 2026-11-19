@@ -6,7 +6,7 @@
 export type GuideBlock = string | string[];
 export interface GuideSection { id: string; title: string; blocks: GuideBlock[] }
 
-export const GUIDE_UPDATED = '2026-11-17';
+export const GUIDE_UPDATED = '2026-11-19';
 export const GUIDE: GuideSection[] = [
   { id: 'start', title: 'Start here', blocks: [
     'CBT Practice Log helps you practise CBT skills for anxiety: write down anxious moments, test your thoughts and face fears in small steps.',
@@ -35,7 +35,9 @@ export const GUIDE: GuideSection[] = [
     ['**Part 1, in the moment**: what happened, how anxious you are (0 to 100), what you feel in your body, the thought, how much you believe it, and what you did to feel safe.',
       '**Part 2, later, when you are calm**: thinking traps, facts for and against the thought, a balanced thought, what really happened, and how anxious you are now.'],
     'Tap **+ Journal** when you just want to write. A journal entry has no Part 2.',
-    'Tip: to dictate, tap the microphone on your keyboard.' ] },
+    'To speak instead of type, tap **Speak** above a text box. Your words appear as you talk. Tap **Listening… tap to stop** when you are done.',
+    ['Speech is turned into text on your phone. Nothing you say leaves the phone. If your phone cannot do that, the app tells you and voice input stays off. Then use the microphone on your keyboard.',
+      'The first time, Android may ask you to download the offline speech pack for your language. Tap **Download**.'] ] },
   { id: 'rerate', title: 'Re-rate your anxiety after you calm down', blocks: [
     'In Part 2 you see your thought from Part 1, how much you believed it and how anxious you were.',
     ['Under **How anxious are you now?** you see the change, for example "Down 35 from 70".',
@@ -77,9 +79,11 @@ export const GUIDE: GuideSection[] = [
     ['Your data stays on this phone, in an encrypted database. Without cloud backup there is no account and nothing leaves the phone.',
       'With cloud backup, only an encrypted copy leaves the phone. Without your passphrase nobody can read it.',
       'In **More** you can set your country, export all your data as a file, or delete everything.',
+      'Voice input runs on the phone only. Your voice and the text never go to a server.',
       'No ads, no tracking, no analytics.'] ] },
 ];
 export const GUIDE_CHANGES: [string, string][] = [
+  ['2026-11-19', 'Speak your entries: a **Speak** button on text boxes, on the phone only. The widget buttons show their labels again.'],
   ['2026-11-17', 'The widget shows a new saying every day, even when the app stays closed. Pick the kind of sayings: both, putting things off, or social anxiety.'],
   ['2026-11-16', 'Move your data by copy and paste: **Copy all my data** in the tracker, then paste it in Import. New sayings about procrastination and social anxiety.'],
   ['2026-11-16', 'The Android widget is smaller: one row on the home screen, and you can resize it.'],

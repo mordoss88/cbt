@@ -3,9 +3,10 @@ import Slider from '@react-native-community/slider';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { anxietyLevel } from '../core/cbt';
+import { MicButton } from './MicButton';
 import { QuickHelpFab } from './QuickHelpFab';
 import { C, F, levelColor } from './theme';
 
@@ -155,13 +156,15 @@ export function Rating({ label, value, onChange, hint, max = 100, step = 5, low 
   );
 }
 
-export function Field({ label, value, onChangeText, multiline = true, placeholder, ...rest }: {
-  label: string; value: string | undefined; onChangeText: (t: string) => void; placeholder?: string; multiline?: boolean;
+/* A labelled text field. Multi-line fields get a Speak button for voice input (on the phone only, see MicButton). */
+export function Field({ label, value, onChangeText, multiline = true, placeholder, dictate = multiline, ...rest }: {
+  label: string; value: string | undefined; onChangeText: (t: string) => void; placeholder?: string; multiline?: boolean; dictate?: boolean;
 } & Omit<TextInputProps, 'value' | 'onChangeText'>) {
   const [focus, setFocus] = useState(false);
   return (
     <View style={{ gap: 6 }}>
       <Text style={{ fontFamily: F.bodyBold, fontSize: 15, color: C.ink }}>{label}</Text>
+      {dictate && Platform.OS !== 'web' ? <MicButton value={value ?? ''} onChange={onChangeText} label={label} /> : null}
       <TextInput value={value ?? ''} onChangeText={onChangeText} multiline={multiline} placeholder={placeholder} placeholderTextColor={C.inkSoft}
         onFocus={() => setFocus(true)} onBlur={() => setFocus(false)} accessibilityLabel={label}
         style={{ fontFamily: F.hand, fontSize: 20, color: C.ink, backgroundColor: C.paper, borderColor: focus ? C.skyDeep : C.ink, borderWidth: 2.5,
