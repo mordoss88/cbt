@@ -2,7 +2,7 @@
    - Only signed-in people of this project can use it (Supabase JWT), and optionally only the ids in COACH_ALLOWED_USERS.
    - It holds the Anthropic API key (secret ANTHROPIC_API_KEY) and the coach rules (rules.ts), so the app has neither.
    - Safety gate: it runs only when the secret COACH_ENABLED_MODEL names the model in use, which is set after that model
-     passed all 27 coach safety tests (scripts/coach-safety.ts).
+     passed every coach safety test (scripts/coach-safety.ts: 25 messages, plus the 4 crisis ones for the US).
    - It stores nothing and logs no content: no database writes, and logs have only status codes.
    Answer: one JSON object per line: {"type":"text","text":...} while Claude writes, then {"type":"done",...} or {"type":"error",...}. */
 import Anthropic from 'npm:@anthropic-ai/sdk@1.14.0';
