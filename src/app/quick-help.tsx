@@ -1,13 +1,16 @@
-/* Quick help, for panic. Breathing starts by itself (in 4, out 6). Same content as the tracker's panel. */
+/* Quick help, for panic. Breathing starts by itself (in 4, out 6). Same content as the tracker's panel, plus
+   "Are you alone?": out-loud and body techniques when alone, silent ones with other people (core/quickHelp.ts).
+   The medical signs and the numbers always show. */
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Animated, Easing, Linking, Pressable, Text, View } from 'react-native';
 import { country } from '../core/cbt';
+import { helpContent, type HelpContent, type HelpPlace } from '../core/quickHelp';
 import { useStore } from '../data/store';
 import { Btn, Bullets, Comic, P, Page, Panel, Row, ThoughtBubble } from '../ui/kit';
 import { C, F } from '../ui/theme';
 
-function Breathing() {
+function Breathing({ h }: { h: HelpContent }) {
   const [running, setRunning] = useState(true);
   // One breath is 10 seconds: 4 in, 6 out.
   const [sec, setSec] = useState(0);
@@ -27,8 +30,8 @@ function Breathing() {
   }, [running, phase, scale]);
   return (
     <Comic bg={C.sky} inner={{ gap: 10, alignItems: 'center' }}>
-      <Text style={{ fontFamily: F.display, fontSize: 19, color: C.ink, alignSelf: 'flex-start' }}>1 · Breathe out slowly</Text>
-      <P>Breathe in for 4. Breathe out for 6. A long breath out tells your body to calm down.</P>
+      <Text style={{ fontFamily: F.display, fontSize: 19, color: C.ink, alignSelf: 'flex-start' }}>{h.breatheTitle}</Text>
+      <P>{h.breathe}</P>
       <View style={{ width: 200, height: 200, alignItems: 'center', justifyContent: 'center' }} accessibilityLiveRegion="polite"
         accessibilityLabel={running ? `Breathe ${phase}, ${count}` : 'Breathing paused'}>
         <Animated.View style={{ position: 'absolute', width: 190, height: 190, borderRadius: 95, borderWidth: 3, borderColor: C.ink,
@@ -44,11 +47,11 @@ function Breathing() {
 
 const SENSES: [number, string][] = [[5, 'things you can see'], [4, 'things you can feel'], [3, 'things you can hear'], [2, 'things you can smell'], [1, 'thing you can taste']];
 
-function Grounding() {
+function Grounding({ hint }: { hint: string }) {
   const [taps, setTaps] = useState<number[]>([0, 0, 0, 0, 0]);
   return (
     <Panel title="3 · Ground yourself: 5-4-3-2-1">
-      <P muted>Look around. Tap one dot for each thing you find.</P>
+      <P muted>{hint}</P>
       {SENSES.map(([n, label], i) => (
         <View key={label} style={{ gap: 4 }}>
           <P bold>{n} {label}</P>
@@ -77,9 +80,29 @@ function Numbers({ list }: { list: [string, string][] }) {
   );
 }
 
+function Place({ place, onPick }: { place: HelpPlace | null; onPick: (p: HelpPlace) => void }) {
+  const chip = (p: HelpPlace, label: string) => (
+    <Pressable key={p} onPress={() => onPick(p)} accessibilityRole="radio" accessibilityState={{ checked: place === p }}
+      style={{ borderColor: C.ink, borderWidth: 2.5, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8, backgroundColor: place === p ? C.calm : C.paper }}>
+      <Text style={{ fontFamily: F.bodySemi, fontSize: 15, color: C.ink }}>{label}</Text>
+    </Pressable>
+  );
+  return (
+    <View style={{ gap: 6 }} accessibilityRole="radiogroup" accessibilityLabel="Are you alone right now?">
+      <P bold>Are you alone right now?</P>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+        {chip('alone', 'Yes, alone')}
+        {chip('others', 'With other people')}
+      </View>
+    </View>
+  );
+}
+
 export default function QuickHelp() {
-  const { settings } = useStore();
+  const { settings, setSettings } = useStore();
   const c = country(settings.country);
+  const place = settings.helpPlace ?? null;
+  const h = helpContent(place);
   return (
     <Page help={false}>
       <View style={{ height: 40 }} />
@@ -89,16 +112,14 @@ export default function QuickHelp() {
       </Row>
       <P bold>Stay with this page. The wave will pass.</P>
       <Comic bg={C.paper}><P>This is anxiety. It feels awful, but it is not dangerous. It goes up, and then it comes down.</P></Comic>
-      <Breathing />
-      <Panel title="2 · Let the wave pass">
-        <Bullets items={[
-          'Do not fight the feelings. Notice them and let them stay. They pass faster this way.',
-          'Drop your shoulders. Unclench your jaw. Press your feet into the floor.',
-          'If you can, stay where you are. When you leave, your brain learns that the place is dangerous.',
-        ]} />
+      <Place place={place} onPick={(p) => setSettings({ helpPlace: p })} />
+      <Breathing h={h} />
+      <Panel title={h.waveTitle}>
+        <Bullets items={h.wave} />
       </Panel>
-      <Grounding />
+      <Grounding hint={h.groundingHint} />
       <Panel title="4 · Answer the panic thought">
+        <P muted>{h.answerHint}</P>
         {[
           ['I am having a heart attack.', 'A fast heart is a normal part of panic. It is your body\'s alarm, not damage.'],
           ['I cannot breathe.', 'You get enough air. Fast breathing makes the air feel short. Breathe out slowly.'],

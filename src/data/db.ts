@@ -18,8 +18,10 @@ export interface Settings {
   introSeen: boolean;
   /* The day the person tapped "Not today" on the Today task. */
   taskHiddenDay: string | null;
+  /* Quick help: the last answer to "Are you alone?". */
+  helpPlace?: 'alone' | 'others' | null;
 }
-export const defaultSettings = (): Settings => ({ country: null, introSeen: false, taskHiddenDay: null });
+export const defaultSettings = (): Settings => ({ country: null, introSeen: false, taskHiddenDay: null, helpPlace: null });
 
 async function dbKey() {
   let key = await SecureStore.getItemAsync(KEY_NAME);
