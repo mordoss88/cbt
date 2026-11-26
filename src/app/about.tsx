@@ -2,8 +2,10 @@
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { router } from 'expo-router';
+import * as Updates from 'expo-updates';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { buildInfoRows } from '../core/buildInfo';
 import { COUNTRIES, dayKey, exportData } from '../core/cbt';
 import { useStore } from '../data/store';
 import { Btn, Bullets, P, Page, Panel, Row } from '../ui/kit';
@@ -43,6 +45,7 @@ export default function AboutScreen() {
           'Cloud backup is optional. It is encrypted on this phone with your passphrase, so the server cannot read it.',
           'The home-screen widget gets only the saying of the day.',
           'Voice input (Speak) turns speech into text on this phone only. If the phone cannot, voice input stays off. Nothing you say is sent anywhere.',
+          'The AI coach (Claude) is off unless you turn it on. Then each message you send goes with your entries, ladders and the coach\'s notes through the app\'s coach service to Anthropic, to write the answer. The coach service keeps nothing. The chat and notes stay on this phone.',
         ]} />
       </Panel>
       <Panel title="Your country, for the help numbers">
@@ -71,6 +74,18 @@ export default function AboutScreen() {
         ) : (
           <Btn kind="ghost" title="Delete everything" onPress={() => setConfirm(true)} />
         )}
+      </Panel>
+      <Panel title="Version">
+        <P>Check this after an update to be sure you have the newest code.</P>
+        {buildInfoRows({
+          commitSha: process.env.EXPO_PUBLIC_COMMIT_SHA, commitMessage: process.env.EXPO_PUBLIC_COMMIT_MESSAGE, commitTime: process.env.EXPO_PUBLIC_COMMIT_TIME,
+          updateId: Updates.updateId, updateCreatedAt: Updates.createdAt, isEmbedded: Updates.isEmbeddedLaunch,
+          channel: Updates.channel, runtimeVersion: Updates.runtimeVersion,
+        }).map(([k, v]) => (
+          <Text key={k} selectable style={{ fontFamily: F.body, fontSize: 13, color: C.ink }}>
+            <Text style={{ fontFamily: F.bodySemi }}>{k}: </Text>{v}
+          </Text>
+        ))}
       </Panel>
     </Page>
   );

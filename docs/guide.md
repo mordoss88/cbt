@@ -1,6 +1,6 @@
 # CBT Practice Log app: how to use it
 
-_Updated 2026-11-19. Also in the app: open **More** and tap **Guide**._
+_Updated 2026-11-26. Also in the app: open **More** and tap **Guide**._
 
 ## Start here
 
@@ -11,7 +11,7 @@ CBT Practice Log helps you practise CBT skills for anxiety: write down anxious m
 - **Thoughts**: write down anxious moments (thought records) or free text (journal).
 - **Ladder**: face fears in small steps, from easy to hard.
 - **Patterns**: your week, self-checks and what stands out in your entries.
-- **More**: your daily sayings, import, cloud backup, export, your country and privacy.
+- **More**: the AI coach, your daily sayings, import, cloud backup, export, your country and privacy.
 - **Quick help**: the pink button at the bottom of every screen. Open it during panic.
 
 ## Today: one saying and one small task
@@ -28,7 +28,7 @@ At the top of Thoughts you see the saying of the day and one small task, for exa
 Add the **Daily saying** widget to your home screen. It is part of this app, so you do not need another app.
 
 - iPhone: touch and hold the home screen, tap **Edit** then **Add Widget**, and pick CBT Practice Log.
-- Android: touch and hold the home screen, tap **Widgets**, and pick CBT Practice Log. It takes one row. To make it bigger or smaller, touch and hold it and drag the edges.
+- Android: touch and hold the home screen, tap **Widgets**, and pick CBT Practice Log. It starts at one row. Touch and hold it and drag the edges to resize it, from 2 cells wide and 1 row high up to most of the screen. A bigger widget shows more of the saying in bigger letters; a narrow one shows 👍 and 👎 buttons. If a widget you added before this update does not resize, remove it and add it again.
 - The saying changes every day, also when you do not open the app. On Android it can take up to an hour after midnight. The app sends the next 14 days at a time, so open it at least once every two weeks.
 - Tap **Helps** or **Not for me** on the widget to rate the saying. The rating is saved in the app the next time you open it.
 - On iPhone, tap the saying to open the app. Quick help is one tap away there.
@@ -74,6 +74,7 @@ A fear ladder lists situations you avoid, rated from 0 (easy) to 100 (hardest). 
 
 The pink **Quick help** button is on every screen.
 
+- At the top, answer **Are you alone right now?** Alone, it suggests things to do out loud and with your body (a long sigh, cold water, moving). **With other people**, it shows only things nobody can see (slow breathing through the nose, pressing your feet into the floor). The app remembers your answer; change it any time.
 - A breathing guide starts by itself: in for 4, out for 6.
 - 5-4-3-2-1 grounding, and answers to common panic thoughts.
 - When to get medical help, emergency numbers and crisis lines for your country.
@@ -104,9 +105,18 @@ Cloud backup keeps an encrypted copy of your data online, so you can get it back
 
 Small improvements arrive by themselves. The app checks for an update when you open it and uses it the next time you open it. Bigger changes need a new install.
 
-## The AI coach
+To see which version you have, open **More**, **About, privacy and your data**, and look at **Version**: the commit (code change) and the time of the update you run.
 
-The chat coach from the tracker is not in the app yet. Your coach notes and chat history are imported and kept, so the coach can use them when it comes.
+## The AI coach (Claude)
+
+The coach is an AI (Claude, made by Anthropic). It is not a person and not a therapist. It knows your entries, your ladders and its notes about you, and helps you use CBT with them.
+
+- It is off until you turn it on. Open **More**, tap **Open the coach**, read what is sent, and tap **Turn on the coach**. You need to be signed in (on the Cloud backup screen; you do not have to turn on backups).
+- Write or speak your message and tap **Send**. Or tap one of the questions to start.
+- To talk about one entry, open it and tap **Talk it through with the coach**. The coach gets the whole entry.
+- The coach can save short notes about you and add steps to your ladders when you agree. Tap **Your coach sees…** to read the notes or tap **Forget**.
+- The chat and the notes stay on your phone. **Clear chat** deletes the chat; **Turn the coach off** stops all sending.
+- Not for emergencies. If you are in danger, open **Quick help**.
 
 ## Privacy and your data
 
@@ -114,10 +124,12 @@ The chat coach from the tracker is not in the app yet. Your coach notes and chat
 - With cloud backup, only an encrypted copy leaves the phone. Without your passphrase nobody can read it.
 - In **More** you can set your country, export all your data as a file, or delete everything.
 - Voice input runs on the phone only. Your voice and the text never go to a server.
+- The AI coach is optional. Only when it is on and you send a message, your message, entries, ladders and the coach's notes go through the app's coach service to Anthropic to write the answer. The coach service keeps nothing.
 - No ads, no tracking, no analytics.
 
 ## What changed
 
+- **2026-11-26**: The AI coach (Claude) is in the app, off until you turn it on. Quick help asks if you are alone and suggests what fits. The Android widget resizes from 2x1 to most of the screen and shows more when it is bigger. About shows which version you run.
 - **2026-11-19**: Speak your entries: a **Speak** button on text boxes, on the phone only. The widget buttons show their labels again.
 - **2026-11-17**: The widget shows a new saying every day, even when the app stays closed. Pick the kind of sayings: both, putting things off, or social anxiety.
 - **2026-11-16**: Move your data by copy and paste: **Copy all my data** in the tracker, then paste it in Import. New sayings about procrastination and social anxiety.

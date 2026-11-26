@@ -58,6 +58,8 @@ export default function EntryScreen() {
           <Btn kind="primary" title="Do Part 2" onPress={() => router.replace(`/record?id=${r.id}&part=2`)} />
         </Comic>
       ) : null}
+      <Btn kind="dark" title="Talk it through with the coach" accessibilityLabel="Talk it through with the AI coach. Opens the coach with this entry."
+        onPress={() => router.replace(`/coach?rec=${r.id}`)} />
       <Row>
         <Btn title="Edit" onPress={() => router.replace(journal ? `/journal?id=${r.id}` : `/record?id=${r.id}`)} />
         {confirm ? (

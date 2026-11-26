@@ -29,6 +29,8 @@ interface Store {
   rate(id: string, rating: QuoteRating | null): Promise<void>;
   setSayings(set: SayingSet): Promise<void>;
   setSettings(s: Partial<DB.Settings>): Promise<void>;
+  /* Coach chat and notes, and ladder steps the coach added. `fn` gets the newest data. */
+  updateData(fn: (d: AppData) => AppData): Promise<AppData>;
   importData(inc: AppData, quoteRatings: QuoteRatingEntry[]): Promise<{ added: number; updated: number }>;
   deleteAll(): Promise<void>;
   syncWidget(): Promise<void>;
@@ -162,6 +164,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const next = { ...settings, ...s };
       setSettingsState(next);
       await DB.setDoc(db, 'settings', next);
+    },
+    async updateData(fn) {
+      const next = fn(dataRef.current);
+      // Keep the last 300 chat messages, like the tracker.
+      const chat = next.chat.length > 300 ? [...next.chat].sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt))).slice(-300) : next.chat;
+      const out = { ...next, chat };
+      await commitData(out);
+      return out;
     },
     async importData(inc, quoteRatings) {
       const { data: merged, summary } = mergeImport(dataRef.current, inc);

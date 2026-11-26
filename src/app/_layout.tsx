@@ -63,6 +63,7 @@ export default function RootLayout() {
               <Stack.Screen name="about" options={{ ...modal, headerShown: true, title: 'About and privacy' }} />
               <Stack.Screen name="guide" options={{ ...modal, headerShown: true, title: 'How to use' }} />
               <Stack.Screen name="sayings" options={{ ...modal, headerShown: true, title: 'Your sayings' }} />
+              <Stack.Screen name="coach" options={{ ...modal, headerShown: true, title: 'AI coach (Claude)' }} />
               <Stack.Screen name="quick-help" options={{ presentation: 'fullScreenModal', animation: 'fade' }} />
             </Stack>
            </BackupProvider>

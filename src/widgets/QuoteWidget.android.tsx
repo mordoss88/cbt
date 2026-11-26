@@ -1,6 +1,9 @@
 /* Android home-screen widget (Glance through expo-widgets). Same props and behavior as QuoteWidget.ios.tsx.
    It shows today's entry of `days`, so the saying changes daily without the app (see plugins/with-widget-refresh.js).
-   Compact: one row of the home screen (4x1, resizable). The saying (2 lines, sayings are at most 78 characters) and two small buttons.
+   Resizable: from 2x1 up to the whole screen. It starts at 4x1. The layout uses the size the launcher gives
+   (`environment.width` and `environment.height` in dp, added by scripts/patch-expo-widgets.js): more lines and bigger text
+   when it is taller, a "Saying for today" title when there is room, short button labels when it is narrow.
+   Without a size (older build, or a button press) it uses the compact 2-line layout. Same button targets in every layout.
    Android widgets support only Box, Column, Row, Spacer, Text and the button components, and a few modifiers.
    The function body runs in the widget runtime: no hooks, no runtime imports, no outside constants. */
 import { Button, Column, Row, Spacer, Text } from '@expo/ui/jetpack-compose';
@@ -8,9 +11,18 @@ import { background, cornerRadius, fillMaxSize, fillMaxWidth, height, padding, w
 import { createWidget } from 'expo-widgets';
 import type { QuoteWidgetProps } from '../core/widgetSync';
 
-const QuoteWidget = (props: QuoteWidgetProps) => {
+const QuoteWidget = (props: QuoteWidgetProps, environment?: any) => {
   'widget';
   const ink = '#2B1D2E';
+  // Size in dp, 0 when unknown. Fixed parts: 12 padding, 6 gap, 32 buttons = 50.
+  const w = Number(environment && environment.width) || 0;
+  const h = Number(environment && environment.height) || 0;
+  const tall = h >= 110;
+  const titled = h >= 170;
+  const narrow = w > 0 && w < 210;
+  const fontSize = tall ? 18 : 15;
+  const lineHeight = tall ? 24 : 20;
+  const lines = h ? Math.max(1, Math.min(10, Math.floor((h - 50 - (titled ? 22 : 0)) / lineHeight))) : 2;
   // Pick today's saying from the list the app sent (same rule as widgetDayFor in core/widgetSync.ts).
   // The widget redraws about once an hour, so a new day shows a new saying even when the app stays closed.
   let days: [string, string, string, string][] = [];
@@ -43,19 +55,21 @@ const QuoteWidget = (props: QuoteWidgetProps) => {
 
   return (
     <Column verticalArrangement="center" modifiers={[fillMaxSize(), background('#FFD36E'), cornerRadius(18), padding(12, 6, 12, 6)]}>
-      <Text color={ink} maxLines={2} style={{ fontSize: 15, fontWeight: 'bold' }}>{text}</Text>
+      {titled ? <Text color={ink} maxLines={1} style={{ fontSize: 12 }}>Saying for today</Text> : null}
+      {titled ? <Spacer modifiers={[height(6)]} /> : null}
+      <Text color={ink} maxLines={lines} style={{ fontSize, fontWeight: 'bold' }}>{text}</Text>
       <Spacer modifiers={[height(6)]} />
       {quoteId ? (
         <Row modifiers={[fillMaxWidth()]}>
           <Button {...pill(upOn, '#1F7F72', 'rate-up')} onClick={(() => rate('up')) as any}>
-            <Row verticalAlignment="center" modifiers={[height(32), padding(14, 0, 14, 0)]}>
-              <Text color={upOn ? '#FFFFFF' : '#1F7F72'} style={{ fontSize: 13, fontWeight: 'bold' }}>{upOn ? 'Helps ✓' : 'Helps'}</Text>
+            <Row verticalAlignment="center" modifiers={[height(32), padding(narrow ? 10 : 14, 0, narrow ? 10 : 14, 0)]}>
+              <Text color={upOn ? '#FFFFFF' : '#1F7F72'} style={{ fontSize: 13, fontWeight: 'bold' }}>{(narrow ? '👍' : 'Helps') + (upOn ? ' ✓' : '')}</Text>
             </Row>
           </Button>
           <Spacer modifiers={[width(8)]} />
           <Button {...pill(downOn, '#8A1C30', 'rate-down')} onClick={(() => rate('down')) as any}>
-            <Row verticalAlignment="center" modifiers={[height(32), padding(14, 0, 14, 0)]}>
-              <Text color={downOn ? '#FFFFFF' : '#8A1C30'} style={{ fontSize: 13, fontWeight: 'bold' }}>{downOn ? 'Not for me ✓' : 'Not for me'}</Text>
+            <Row verticalAlignment="center" modifiers={[height(32), padding(narrow ? 10 : 14, 0, narrow ? 10 : 14, 0)]}>
+              <Text color={downOn ? '#FFFFFF' : '#8A1C30'} style={{ fontSize: 13, fontWeight: 'bold' }}>{(narrow ? '👎' : 'Not for me') + (downOn ? ' ✓' : '')}</Text>
             </Row>
           </Button>
         </Row>
