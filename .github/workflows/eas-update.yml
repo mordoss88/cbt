@@ -38,6 +38,10 @@ jobs:
       - name: Check before publishing
         run: npm run typecheck && npm test
       - name: Publish update
-        run: eas update --channel preview --message "${MESSAGE%%$'\n'*}" --non-interactive
+        run: |
+          export EXPO_PUBLIC_COMMIT_SHA="$(git rev-parse HEAD)"
+          export EXPO_PUBLIC_COMMIT_MESSAGE="$(git log -1 --format=%s)"
+          export EXPO_PUBLIC_COMMIT_TIME="$(git log -1 --format=%cI)"
+          eas update --channel preview --message "${MESSAGE%%$'\n'*}" --non-interactive
         env:
           MESSAGE: ${{ github.event.head_commit.message || 'Manual update' }}
