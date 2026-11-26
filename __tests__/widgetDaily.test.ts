@@ -14,7 +14,7 @@ const MODIFIERS = ['background', 'cornerRadius', 'fillMaxSize', 'fillMaxWidth', 
 const jsx = (c: { type: string }, props: Record<string, unknown>) => ({ type: c.type, props });
 const AndroidWidget = new Function('_jsx', '_jsxs', ...COMPONENTS, ...MODIFIERS, 'return (' + widgetSource + ')')(
   jsx, jsx, ...COMPONENTS.map(el), ...MODIFIERS.map(() => () => ({})),
-) as (p: object) => any;
+) as (p: object, env?: object) => any;
 
 /* Collects every string in the rendered tree. */
 function texts(node: any): string[] {
@@ -23,6 +23,13 @@ function texts(node: any): string[] {
   if (Array.isArray(node)) return node.flatMap(texts);
   if (typeof node === 'object' && 'props' in node) return texts(node.props.children);
   return [];
+}
+function findTexts(node: any, out: any[] = []): any[] {
+  if (!node || typeof node !== 'object') return out;
+  if (Array.isArray(node)) { node.forEach((n) => findTexts(n, out)); return out; }
+  if (node.type === 'Text') out.push(node);
+  findTexts(node.props?.children, out);
+  return out;
 }
 function findButtons(node: any, out: any[] = []): any[] {
   if (!node || typeof node !== 'object') return out;
@@ -118,6 +125,29 @@ describe('the Android widget picks the day itself', () => {
     }
   });
 
+  test('the layout follows the widget size', () => {
+    jest.useFakeTimers().setSystemTime(NOW);
+    const saying = (env?: object) => findTexts(AndroidWidget(props, env)).find((t) => t.props.children === days[0][2]);
+    // No size known (older build, or a button press): the compact 2-line layout.
+    expect(saying()?.props.maxLines).toBe(2);
+    // 4x1: one or two lines, small text, full button labels.
+    const small = AndroidWidget(props, { width: 320, height: 90 });
+    expect(saying({ width: 320, height: 90 })?.props.maxLines).toBe(2);
+    expect(texts(small)).toContain('Not for me');
+    expect(texts(small)).not.toContain('Saying for today');
+    // 4x2 and bigger: more lines, bigger text, a title.
+    const big = saying({ width: 320, height: 220 });
+    expect(big?.props.maxLines).toBeGreaterThan(4);
+    expect(big?.props.style.fontSize).toBe(18);
+    expect(texts(AndroidWidget(props, { width: 320, height: 220 }))).toContain('Saying for today');
+    // Narrow (2 cells): short labels, same button targets.
+    const narrow = AndroidWidget(props, { width: 150, height: 90 });
+    expect(texts(narrow)).toContain('👍');
+    expect(findButtons(narrow).map((b) => b.props.target)).toEqual(['rate-up', 'rate-down']);
+    // Never less than one line.
+    expect(saying({ width: 150, height: 40 })?.props.maxLines).toBe(1);
+  });
+
   test('old props without a list still work', () => {
     const { days: _d, ...old } = props;
     expect(texts(AndroidWidget(old))).toContain(props.text);
@@ -165,5 +195,31 @@ describe('widget refresh plugin', () => {
     const { setUpdatePeriod } = require('../plugins/with-widget-refresh');
     expect(setUpdatePeriod('<appwidget-provider android:updatePeriodMillis="0" />', 3600000))
       .toBe('<appwidget-provider android:updatePeriodMillis="3600000" />');
+  });
+
+  test('makes the widget resizable from 2x1 cells, both ways, and runs twice safely', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { setResize } = require('../plugins/with-widget-refresh');
+    const xml = '<?xml version="1.0" encoding="utf-8"?>\n<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"\n'
+      + '  android:minWidth="250dp"\n  android:minHeight="50dp"\n  android:resizeMode="horizontal"\n  android:widgetCategory="home_screen" />\n';
+    const out = setResize(xml);
+    expect(out).toContain('android:minResizeWidth="110dp"');
+    expect(out).toContain('android:minResizeHeight="40dp"');
+    expect(out).toContain('android:maxResizeWidth="530dp"');
+    expect(out).toContain('android:maxResizeHeight="600dp"');
+    expect(out).toContain('android:resizeMode="horizontal|vertical"');
+    expect(out).toMatch(/<appwidget-provider xmlns:android=/); // the namespace stays first
+    expect(setResize(out)).toBe(out);
+  });
+
+  test('the expo-widgets patch passes the widget size to the layout', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { patchSource } = require('../scripts/patch-expo-widgets');
+    const src = 'override fun provideRoot(\n    size: DpSize\n  ): Emittable {\n    val environment = getWidgetEnvironment(appContext)\n    val node = 1\n';
+    const a = patchSource(src);
+    expect(a.status).toBe('patched');
+    expect(a.src).toContain('"width" to size.width.value.toDouble()');
+    expect(patchSource(a.src).status).toBe('already');
+    expect(patchSource('something else').status).toBe('missing');
   });
 });

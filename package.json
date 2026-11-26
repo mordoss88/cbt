@@ -54,7 +54,8 @@
     "test": "TZ=Europe/Belgrade jest",
     "typecheck": "tsc --noEmit",
     "lint": "expo lint",
-    "guide": "UPDATE_GUIDE=1 TZ=Europe/Belgrade jest __tests__/guide.test.ts"
+    "guide": "UPDATE_GUIDE=1 TZ=Europe/Belgrade jest __tests__/guide.test.ts",
+    "postinstall": "node scripts/patch-expo-widgets.js"
   },
   "private": true,
   "jest": {
