@@ -45,6 +45,7 @@ export default function AboutScreen() {
           'Cloud backup is optional. It is encrypted on this phone with your passphrase, so the server cannot read it.',
           'The home-screen widget gets only the saying of the day.',
           'Voice input (Speak) turns speech into text on this phone only. If the phone cannot, voice input stays off. Nothing you say is sent anywhere.',
+          'The AI coach (Claude) is off unless you turn it on. Then each message you send goes with your entries, ladders and the coach\'s notes through the app\'s coach service to Anthropic, to write the answer. The coach service keeps nothing. The chat and notes stay on this phone.',
         ]} />
       </Panel>
       <Panel title="Your country, for the help numbers">
