@@ -37,6 +37,7 @@
     "react-native-screens": "~4.30.1"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^1.14.0",
     "@react-native/jest-preset": "^0.88.1",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.20.5",

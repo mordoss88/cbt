@@ -80,6 +80,12 @@ export interface ChatMessage {
   role: 'user' | 'assistant';
   text: string;
   createdAt?: string;
+  /* The entry this message is about ("Talk it through with the coach"). */
+  recId?: string;
+  /* What the coach did while answering (saved a note, added a ladder step). */
+  actions?: { type: 'memory' | 'ladder'; text: string }[];
+  /* 'cut' when the answer stopped early, 'stopped' when the person stopped it. */
+  flag?: 'cut' | 'stopped';
 }
 
 export interface AppData {
