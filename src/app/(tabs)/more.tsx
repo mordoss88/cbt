@@ -13,6 +13,10 @@ export default function MoreTab() {
   const liked = ratedList(quotes, 'up').length;
   return (
     <Page>
+      <Panel title="AI coach (Claude)" sticker="Optional" stickerBg={C.calm}>
+        <P>Talk through your entries and plan ladder steps with an AI coach. It is off until you turn it on, and it is not a therapist.</P>
+        <Btn kind="primary" title="Open the coach" onPress={() => router.push('/coach')} />
+      </Panel>
       <Panel title="Your sayings" sticker="Daily" stickerBg={C.calm}>
         <P>{liked ? `${liked} sayings help you. They come back more often.` : 'Rate the saying of the day to shape which ones come back.'}</P>
         <Btn title="Your sayings" onPress={() => router.push('/sayings')} />

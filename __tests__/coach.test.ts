@@ -1,5 +1,5 @@
 import {
-  COACH_MESSAGES, coachDataContext, entryFull, focusIds, historyTurns, parseCoachStream, problemFromStatus, recordLine,
+  COACH_MESSAGES, coachDataContext, runCoachTurn, entryFull, focusIds, historyTurns, parseCoachStream, problemFromStatus, recordLine,
   runCoachTool, stepLines, textOf, toolUses, wholeText,
 } from '../src/core/coach';
 import { emptyData, type AppData, type ChatMessage, type ThoughtRecord } from '../src/core/types';
@@ -168,5 +168,49 @@ describe('coach rules on the server', () => {
     expect(checkRequest({ ...ok, messages: [{ role: 'system', content: 'x' }] })).toBe('bad-request');
     expect(checkRequest({ ...ok, context: 'x'.repeat(400_001) })).toBe('too-large');
     expect(checkRequest(null)).toBe('bad-request');
+  });
+});
+
+describe('one coach answer with tools', () => {
+  const base = (): AppData => ({ ...emptyData(), chat: [{ role: 'user', text: 'Remember my sister is my safe person', createdAt: '2026-11-26T14:00:00Z' }] });
+  const tool = { now: '2026-11-26T14:00:01Z', newId: () => 'n' + Math.random() };
+  test('runs the tool on the phone, sends the result back, and keeps both texts', async () => {
+    const sent: unknown[] = [];
+    const replies = [
+      { stop_reason: 'tool_use', content: [{ type: 'text', text: 'Saving that.' }, { type: 'tool_use', id: 't1', name: 'remember', input: { note: 'Sister is my safe person' } }] },
+      { stop_reason: 'end_turn', content: [{ type: 'text', text: 'Saved.' }] },
+    ];
+    const seen: string[] = [];
+    const r = await runCoachTurn({
+      data: base(), context: 'C', helplines: 'H', now: 'N', tool,
+      send: async (body, onText) => { sent.push(JSON.parse(JSON.stringify(body))); const x = replies.shift()!; onText(String((x.content[0] as { text: string }).text)); return x; },
+      onText: (s) => seen.push(s),
+    });
+    expect(r.text).toBe('Saving that.\n\nSaved.');
+    expect(r.data.notes.map((n) => n.text)).toEqual(['Sister is my safe person']);
+    expect(r.actions).toEqual([{ type: 'memory', text: 'Sister is my safe person' }]);
+    const second = sent[1] as { messages: { role: string; content: unknown }[] };
+    expect(second.messages[1].role).toBe('assistant');
+    expect(second.messages[2]).toEqual({ role: 'user', content: [{ type: 'tool_result', tool_use_id: 't1', content: 'saved' }] });
+    expect(seen[seen.length - 1]).toBe('Saving that.\n\nSaved.');
+  });
+
+  test('an error keeps what was written and says what went wrong; a refusal keeps nothing of that round', async () => {
+    const cut = await runCoachTurn({ data: base(), context: 'C', helplines: 'H', now: 'N', tool,
+      send: async (_b, onText) => { onText('Half an ans'); return { error: 'overloaded' }; } });
+    expect(cut).toMatchObject({ text: 'Half an ans', problem: 'overloaded', flag: 'cut' });
+    const refused = await runCoachTurn({ data: base(), context: 'C', helplines: 'H', now: 'N', tool,
+      send: async (_b, onText) => { onText('x'); return { error: 'refused' }; } });
+    expect(refused).toMatchObject({ text: '', problem: 'refused' });
+    const status = await runCoachTurn({ data: base(), context: 'C', helplines: 'H', now: 'N', tool, send: async () => ({ error: '', status: 503 }) });
+    expect(status.problem).toBe('not-enabled');
+  });
+
+  test('stops after a few tool rounds', async () => {
+    let calls = 0;
+    const r = await runCoachTurn({ data: base(), context: 'C', helplines: 'H', now: 'N', tool,
+      send: async () => { calls++; return { stop_reason: 'tool_use', content: [{ type: 'tool_use', id: 't' + calls, name: 'remember', input: { note: 'n' + calls } }] }; } });
+    expect(calls).toBe(4);
+    expect(r.flag).toBe('cut');
   });
 });

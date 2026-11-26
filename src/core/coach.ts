@@ -312,3 +312,53 @@ export function problemFromStatus(status: number, code?: string): CoachProblem {
   if (status === 529) return 'overloaded';
   return 'other';
 }
+
+/* ---- one answer: ask, run the tools the coach asked for, ask again (at most MAX_TOOL_ROUNDS) ---- */
+export type SendResult = { stop_reason: string | null; content: unknown[] } | { error: string; status?: number };
+export interface CoachRequest { context: string; helplines: string; now: string; messages: { role: 'user' | 'assistant'; content: unknown }[] }
+export interface TurnResult { data: AppData; text: string; actions: CoachAction[]; flag?: 'cut'; problem?: CoachProblem }
+
+export async function runCoachTurn(args: {
+  data: AppData; context: string; helplines: string; now: string;
+  send: (body: CoachRequest, onText: (t: string) => void) => Promise<SendResult>;
+  onText?: (soFar: string) => void;
+  tool: { now: string; newId: () => string; openLadderId?: string };
+}): Promise<TurnResult> {
+  let data = args.data;
+  const history = historyTurns(data.chat);
+  if (!history.length) return { data, text: '', actions: [], problem: 'empty' };
+  const messages: CoachRequest['messages'] = history.map((t) => ({ role: t.role, content: t.content }));
+  const actions: CoachAction[] = [];
+  const texts: string[] = [];
+  for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+    let live = '';
+    const before = texts.join('\n\n');
+    const res = await args.send({ context: args.context, helplines: args.helplines, now: args.now, messages }, (t) => {
+      live += t;
+      args.onText?.((before ? before + '\n\n' : '') + live);
+    });
+    if ('error' in res) {
+      const problem = problemFromStatus(res.status ?? 0, res.error);
+      const partial = [...texts, live].filter((s) => s.trim()).join('\n\n');
+      return { data, text: problem === 'refused' ? texts.join('\n\n') : partial, actions, problem, flag: partial ? 'cut' : undefined };
+    }
+    const t = textOf(res.content);
+    if (t.trim()) texts.push(t.trim());
+    const uses = toolUses(res.content);
+    if (res.stop_reason !== 'tool_use' || !uses.length) {
+      const text = texts.join('\n\n');
+      if (!text && !actions.length) return { data, text: '', actions, problem: 'empty' };
+      return { data, text, actions, flag: res.stop_reason === 'max_tokens' ? 'cut' : undefined };
+    }
+    // Send the coach's whole turn back unchanged (with its thinking), then the tool results.
+    messages.push({ role: 'assistant', content: res.content });
+    const results = uses.map((u) => {
+      const r = runCoachTool(u.name, u.input, data, args.tool);
+      data = r.data;
+      if (r.action) actions.push(r.action);
+      return { type: 'tool_result', tool_use_id: u.id, content: r.result, ...(r.isError ? { is_error: true } : {}) };
+    });
+    messages.push({ role: 'user', content: results });
+  }
+  return { data, text: texts.join('\n\n'), actions, flag: 'cut' };
+}

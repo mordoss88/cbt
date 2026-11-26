@@ -20,8 +20,10 @@ export interface Settings {
   taskHiddenDay: string | null;
   /* Quick help: the last answer to "Are you alone?". */
   helpPlace?: 'alone' | 'others' | null;
+  /* When the person turned on the AI coach (ISO time), or null when it is off. */
+  coachOn?: string | null;
 }
-export const defaultSettings = (): Settings => ({ country: null, introSeen: false, taskHiddenDay: null, helpPlace: null });
+export const defaultSettings = (): Settings => ({ country: null, introSeen: false, taskHiddenDay: null, helpPlace: null, coachOn: null });
 
 async function dbKey() {
   let key = await SecureStore.getItemAsync(KEY_NAME);
